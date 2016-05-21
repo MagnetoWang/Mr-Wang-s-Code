@@ -1,0 +1,562 @@
+#include<stdio.h>
+#include<iostream>
+#include<string.h>
+#include<stdlib.h>
+using namespace std;
+#define LEN sizeof(bookInfomation)
+#define SLEN sizeof(Students)
+typedef struct bookInfomation
+{
+    char bookname[30];
+    char ISBN[30];
+    int price;
+    char author[20];
+    bool Isitborrowed;
+    char name[30];
+    char sex[10] ;
+    char ID[30];
+    bookInfomation *next;
+};
+typedef struct Students
+{
+    bool accessed;
+    char name[30];
+    char sex[10] ;
+    char ID[30];
+    Students *next;
+};
+bookInfomation *creat(void)
+{
+    int n=0;
+    bookInfomation *head,*tail,*midlink;
+    char name[30];
+    midlink=(bookInfomation *)malloc(LEN);
+    tail=midlink;
+    cout<<"输入书名或者输入0表示停止输入"<<endl;
+    cin>>name;
+    if(strcmp(name,"0")!=0)
+    {
+            strcpy(midlink->bookname,name);
+            cout<<"输入ISBN"<<endl; cin>>midlink->ISBN；
+            cout<<"输入价格"<<endl; cin>>midlink->price;
+            cout<<"输入作者姓名"<<endl; cin>>midlink->author;
+            cout<<"输入0表示未被借，1表示已借"<<endl;
+             cin>>midlink->Isitborrowed;
+             tail=midlink;
+             midlink=midlink->next;
+             head=NULL;
+        while (1)
+        {
+            n++;
+            if (n==1)
+            {
+                head=midlink;
+            }
+            else
+            {
+                tail->next=midlink;
+                tail=midlink;//链表之间的传递特别需要注意
+            }
+           // cout<<"输入"<<endl; cin>>ISBN;
+           cout<<"输入书名或者输入0表示停止输入"<<endl;
+           cin>>name;
+           if (strcmp(name,"0")!=0)
+           {
+            midlink=(bookInfomation *)malloc(LEN);
+            strcpy(midlink->bookname,name);
+            cout<<"输入ISBN"<<endl; cin>>midlink->ISBN；
+            cout<<"输入价格"<<endl; cin>>midlink->price;
+            cout<<"输入作者姓名"<<endl; cin>>midlink->author;
+            cout<<"输入0表示未被借，1表示已借"<<endl;
+             cin>>midlink->Isitborrowed;
+           }else
+           {
+               tail->next=NULL;
+               break;
+           }
+        }
+        tail->next=NULL;
+        
+    }
+    return head;
+}
+bookInfomation *search(bookInfomation *head)
+{
+    int n=0;
+    char name[30];
+    cout<<"输入你要查询的书名"<<endl;
+    cin>>name;
+    bookInfomation *tail,*midlink;
+    midlink=head;
+    tail=head;
+    midlink==(bookInfomation *)malloc(LEN);
+    while (strcmp(midlink->bookname,name)!=0&&midlink->next!=NULL)
+    {
+        midlink=midlink->next;
+        //midlink=tail;
+    }
+    if (strcmp(midlink->bookname,name)==0)
+    {
+        n++;
+        cout<<midlink->bookname;
+        cout<<midlink->ISBN;
+        cout<<price<<author<<Isitborrowed<<endl;
+    }
+    if (n==0)
+    {
+        cout<<"没有你要寻找的书\n";
+    }
+    return head;
+}
+bookInfomation *delete_data(bookInfomation *head)
+{
+    bookInfomation *tail,*midlink;
+    char name[30];
+    midlink=head;
+    tail=head;
+    cout<<"输入删除书名"<<endl;
+    cin>>name;
+    int n=0
+    if (strcmp(midlink->bookname,name)==0)
+    {
+        head=head->next;
+        return head;
+    }
+    else
+    {
+        midlink=midlink->next;
+    }
+    while(midlink->next!=NULL)
+    {
+        n++;
+        if(strcmp(midlink->bookname,name)==0)
+        {
+            tail->next=midlink->next;
+        }
+        tail=tail->next;
+        midlink=midlink->next;
+    }   
+    return head;
+}
+Students *Stucreat()
+{
+    Students *Shead,*Smidlink,*Stail;
+    int n;
+    Shead=(Students *)malloc(SLEN);
+    Smidlink=Shead;
+    Stail=Shead;
+    cour<<"输入注册学生姓名或者输入0表示退出"<<endl;
+    char name[30];
+    cin>>name;
+    if (strcmp(name,"0")==0)
+    {
+        cout<<"无任何注册人信息\n"
+        return 0;
+    }
+    
+    if (strcmp(name,"0")!=0)
+    {
+        strcpy(Smidlink->name,name);
+        cout<<"输入1表示允许注册，输入0表示拒绝接受注册\n"
+        cin>>Smidlink->accessed;
+        cout<<"输入性别\n";
+        cin>>Smidlink->sex;
+        cout<<"输入ID号\n";
+        cin>>Smidlink->ID;
+        Smidlink=Shead->next;
+        Stail=Shead
+        while (1)
+        {
+               cour<<"输入注册学生姓名或者输入0表示退出"<<endl;
+               cin>>name;
+               if (strcmp(name,"0")!=0)
+               {
+                   Smidlink=(Students *)malloc(SLEN);
+                   strcpy(Smidlink->name,name);
+                     cout<<"输入1表示允许注册，输入0表示拒绝接受注册\n"
+                     cin>>Smidlink->accessed;
+                     cout<<"输入性别\n";
+                     cin>>Smidlink->sex;
+                     cout<<"输入ID号\n";
+                     cin>>Smidlink->ID;
+                     Smidlink=Smidlink->next;
+                     continue;
+               }
+               Smidlink->next=NULL;
+               return Shead;
+    }
+}
+bookInfomation *borrowed(bookInfomation *head,Students *Shead)
+{
+    bookInfomation *tail,*midlink;
+    Students *Stail,*Smidlink;
+    int n=0;
+    midlink=head;
+    tail=head;
+    Stail=Shead;
+    Smidlink=Shead;
+    char name[30];
+    char personname[30];
+    cout<<"输入你的姓名\n";
+    cin>>personname;
+    while (Smidlink->next!=NULL)
+    {
+        
+        if (strcmp(Smidlink->name,personname)==0)
+        {
+            cout<<"允许借书"<<endl;
+            n++;
+            break;
+        }
+        Smidlink=Smidlink->next;
+    }
+    if(n==0)
+    {
+        cout<<"不允许借书\n"
+        return head;
+    }
+    cout<<"输入需要借的书\n";
+    n=0;
+    cin>>name;
+    while (midlink->next!=NULL)
+    {
+        if (strcmp(midlink->name,personname)==0)
+        {
+            if (Isitborrowed)
+            {
+                cout<<"书已经被借，无法借书\n"
+            }else
+            {
+                midlink->Isitborrowed=1;
+                midlink->name=Smidlink->name;
+                midlink->sex=Smidlink->sex;
+                midlink->ID=Smidlink->ID;
+                cout<<"借书成功\n";
+                break;
+            }
+        }
+    }
+    return head;
+}
+bookInfomation *return11(bookInfomation *head,Students *Shead)
+{
+    bookInfomation *tail,*midlink;
+    Students *Stail,*Smidlink;
+    int n=0;
+    midlink=head;
+    tail=head;
+    Stail=Shead;
+    Smidlink=Shead;
+    char name[30];
+    char personname[30];
+    cout<<"输入你的姓名\n";
+    cin>>personname;
+    while (Smidlink->next!=NULL)
+    {
+        
+        if (strcmp(Smidlink->name,personname)==0)
+        {
+            cout<<"允许还书"<<endl;
+            n++;
+            break;
+        }
+        Smidlink=Smidlink->next;
+    }
+    if(n==0)
+    {
+        cout<<"姓名错误\n"
+        return head;
+    }
+    cout<<"输入需要还的书\n";
+    n=0;
+    cin>>name;
+    while (midlink->next!=NULL)
+    {
+        if (strcmp(midlink->name,personname)==0)
+        {
+            midlink->Isitborrowed=0;
+            cout<<"还书成功\n";
+            break;
+            // if (Isitborrowed)
+            // {
+            //     cout<<"书已经被借，无法借书\n"
+            // }else
+            // {
+            //     midlink->Isitborrowed=1;
+            //     midlink->name=Smidlink->name;
+            //     midlink->sex=Smidlink->sex;
+            //     midlink->ID=Smidlink->ID;
+            //     cout<<"借书成功\n";
+            //     break;
+            // }
+        }
+    }
+    return head;
+
+}
+void savestudents(Students *Shead)
+{
+    FILE *fp;
+    Students *p1;
+    fp=fopen("studentsdata.txt","w");
+    if(fp==NULL)
+    {
+        cout>>"cannot open file";
+        return;
+    }
+    p1=Shead;
+    fprintf(fp,"学生姓名    性别     ID号\n");
+    for ( ; p1!=NULL; )
+    {
+        fprintf(fp,"%s        %s       %s\n",p1->name,p1->sex,p1->ID);
+        p1=p1->next;
+    }
+    cout<<"保存成功\n"
+    fclose(fp);
+}
+Students *openstudentfile(Students *Shead)
+{
+    FILE *fp;
+	 Students *Smidlink,*Stail;
+  //   cout<<"输入文件名studentsdata"
+	fp=fopen("studentsdata.txt","r");
+	if(fp==NULL)
+	{
+		printf("fail\n");
+        return;
+	}
+	// else
+	// {
+	// 	head=shifang(head);
+	// }
+	Smidlink=(Students *)malloc(SLEN);
+    Shead=Smidlink;
+	fscanf(fp,"%s%s%s",
+    &Smidlink->name,&Smidlink->sex,&Smidlink->ID);
+	if(feof(fp)!=0)
+	{
+		printf("文件打开成功\n");
+		return(Shead);
+	}
+	else
+	{
+		rewind(fp);
+		Stail=Smidlink;
+        Shead=Smidlink;
+		n=0;
+		while(feof(fp)==0)
+		{
+            	fscanf(fp,"%s%s%s",
+    &Smidlink->name,&Smidlink->sex,&Smidlink->ID);
+  			if(feof(fp)!=0)
+				break;
+                Smidlink=Smidlink->next;
+			Smidlink=(Students *)malloc(SLEN);
+			n=n+1;
+		}
+		Smidlink->next=NULL;
+	//	Smidlink=Shead;
+	//	Shead=Shead->next;
+	//	n=n-1;
+		free(Smidlink);
+	//	print(head);
+		printf("文件打开成功!\n");
+		return(Shead);
+	}
+    fclose(fp);
+}
+bookInfomation *meau(bookInfomation *head)
+{
+    char name[30];
+    int n;
+    Students *Shead,*Stail,*Smidlink;
+    bookInfomation *tail,*midlink;
+    printf("1：创建注册人信息\n")；
+    cout<<"2:借书"<<endl;
+    cout<<"3:还书"<<endl;
+    cout<<"4:打开文件"<<endl;
+    cout<<"5:退出"<<endl;
+    cout<<"6：保存文件"<<endl;
+    cin>>n;
+    while (1)
+    {
+        switch (n)
+        {
+            case 1:
+            {
+                Shead=Stucreat();
+                break;
+            }
+            case 2:
+            {
+                borrowed(head,Shead);
+                break;
+            }
+            case 3:
+            {
+                return11(head,Shead);
+            }
+            case 4:
+            {
+                openstudentfile();
+            }
+            case 6:
+            {
+                savestudents(Shead);
+            }
+        default:
+            break;
+        }
+        if (n==5)
+        {
+            return head;
+        }
+    }
+    return head;
+}
+void save(bookInfomation *Shead)//dfasdf
+{
+    FILE *fp;
+    Students *p1;
+    fp=fopen("bookINFO.txt","w");
+    if(fp==NULL)
+    {
+        cout>>"cannot open file";
+        return;
+    }
+    p1=Shead;
+    fprintf(fp,"书名\tISBN\t价格\t作者\t借书状况\n");
+    for ( ; p1!=NULL; )
+    {
+        fprintf(fp,"%s\t%s\t%d\n",p1->bookname,
+        p1->ISBN,p1->price,p1->author);
+        if (p1->Isitborrowed)
+        {
+            fprintf(fp,"书已借\n借书人姓名\t性别\tID号\n");
+            fprintf(fp,"%s\t%s\t%s\n",p1->name,p1->sex,p1->ID);
+        }
+        else
+        {
+            fprintf(fp,"书未杰\n借书人姓名\t性别\tID号\n");
+            fprintf(fp,"none\tnone\tnone\n",);
+        }
+        p1=p1->next;
+    }
+    cout<<"保存成功\n"
+    fclose(fp);
+}
+bookInfomation *openbookfile(bookInfomation *head)
+{
+    FILE *fp;
+	 bookInfomation *Smidlink,*Stail;
+  //   cout<<"输入文件名studentsdata"
+	fp=fopen("bookINFO.txt","r");
+	if(fp==NULL)
+	{
+		printf("fail\n");
+        return;
+	}
+	// else
+	// {
+	// 	head=shifang(head);
+	// }
+	Smidlink=(bookInfomation *)malloc(LEN);
+    head=Smidlink;
+	fscanf(fp,"%s%s%d%s%s%s%s%s",
+    &Smidlink->bookname,&Smidlink->ISBN,&Smidlink->price,
+    &Smidlink->author,&Smidlink->Isitborrowed,&Smidlink->name
+    ,&Smidlink->sex,&Smidlink->ID);
+	if(feof(fp)!=0)
+	{
+		printf("文件打开成功\n");
+		return(head);
+	}
+	else
+	{
+		rewind(fp);
+		Stail=Smidlink;
+        head=Smidlink;
+		n=0;
+		while(feof(fp)==0)
+		{
+            	fscanf(fp,"%s%s%d%s%s%s%s%s",
+    &Smidlink->bookname,&Smidlink->ISBN,&Smidlink->price,
+    &Smidlink->author,&Smidlink->Isitborrowed,&Smidlink->name
+    ,&Smidlink->sex,&Smidlink->ID);
+  			if(feof(fp)!=0)
+				break;
+                Smidlink=Smidlink->next;
+			Smidlink=(bookInfomation *)malloc(LEN);
+			n=n+1;
+		}
+		Smidlink->next=NULL;
+	//	Smidlink=Shead;
+	//	Shead=Shead->next;
+	//	n=n-1;
+		free(Smidlink);
+	//	print(head);
+		printf("文件打开成功!\n");
+		return(head);
+	}
+}
+int main()
+{
+    int n;
+    bookInfomation head;
+    printf("图书管理系统\n");
+    printf("请选择\n");
+    printf("1:创建文件");
+    printf("2:查询图书");
+    printf("3:删除图书");
+    printf("4:办理借书手续");
+    printf("5：打开图书文件");
+    printf("6:保存文件");
+    printf("7:退出");
+    cin>>n;
+    if (n==6)
+    {
+        return 0;
+    }
+    else 
+    {
+        while(1)
+        {
+            switch (n)
+            {
+            case 1:
+            {
+                creat();
+                break;
+            }
+            case 2:
+            {
+               head=search(head);
+               break;
+            }
+            case 3:
+            {
+                head=delete_data(head);
+                break;
+            }
+            case 4:
+            {
+                meau()
+                break;
+            }
+            case 5:
+            {
+                head=openbookfile();
+                break;
+            }
+            case 6:
+            {
+                save(head);
+                break;
+            }
+            default:
+                break;
+            }
+            if(n==7） break;
+        }
+    }
+}
