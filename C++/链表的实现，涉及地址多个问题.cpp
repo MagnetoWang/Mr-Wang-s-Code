@@ -38,13 +38,16 @@ int main(int argc, char const *argv[])
 	PrintSets(Sets2);
 	Sets *Set_And = (XSets)malloc(sizeof(Sets));
 	And_Sets(Sets1, Sets2, Set_And);
+	cout << "并集" << endl;
 	PrintSets(Set_And);
 	XSets Set_Inter = (XSets)malloc(sizeof(Sets));
 	Set_Intersection(Sets1, Sets2, Set_Inter);
+	cout << "交集" << endl;
 	PrintSets(Set_Inter);
 	XSets Set_Complem = (XSets)malloc(sizeof(Sets));
 	Complementary_Sets(Sets1, Sets2, Set_Complem);//不是结构体数组，这里传值需要特别注意
 	PrintSets(Set_Complem);
+	cout << "差集" << endl;
 	return 0;
 }
 void CreatSets(Sets *head)
