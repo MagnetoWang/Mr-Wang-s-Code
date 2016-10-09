@@ -1,54 +1,61 @@
 
 #include<iostream>//int
 using namespace std;
-struct Sets
+typedef struct sets
 {
 	int elements;
-	Sets *next;
+	struct sets *next;
 	int howmany;
 
-};
-Sets CreatSets();
+}Sets,*XSets;
+void CreatSets(Sets *head);
 Sets And_Sets(Sets *Sets1, Sets *Sets2);
 Sets Set_Intersection(Sets *Sets1, Sets *Sets2);
 Sets Complementary_Sets(Sets *Sets1, Sets *Sets2);
 void PrintSets(Sets *Setss)
 {
-    Sets *p=Setss;
-    int n=p->howmany;
-	for(int i=0;i<=n;i++)
-    {
-        p=p->next;
-        cout<<p -> elements;
-        
-    }
+	Sets *p = Setss;
+	int n = p->howmany;
+	for (int i = 0; i <= n; i++)
+	{
+		p = p->next;
+		cout << p->elements<<' ';
+
+	}
 };
 int main(int argc, char const *argv[])
 {
-	Sets Sets1 = CreatSets();
-	Sets Sets2 = CreatSets();
-    PrintSets(&Sets1);
-    PrintSets(&Sets2);
+	Sets Sets1;
+	//memset(&Sets1, 0, sizeof(Sets));
+	//(&Sets1)malloc(sizeof(Sets1));
+		CreatSets(&Sets1);
+        PrintSets(&Sets1);
+		Sets Sets2;
+		memset(&Sets2, 0, sizeof(Sets));
+		CreatSets(&Sets2);
+	
+	PrintSets(&Sets2);
 	Sets Set_And = And_Sets(&Sets1, &Sets2);
+//	PrintSets(&Set_And);
 	Sets Set_Inter = Set_Intersection(&Sets1, &Sets2);
-	Sets Set_Complem = Complementary_Sets(&Sets1,&Sets2);//不是结构体数组，这里传值需要特别注意
+	Sets Set_Complem = Complementary_Sets(&Sets1, &Sets2);//不是结构体数组，这里传值需要特别注意
 
 	return 0;
 }
-Sets CreatSets()
+void CreatSets(Sets *head)
 {
 	cout << "How many elements" << endl;
 	int n;
 	cin >> n;
-/*	Sets head;//结构体需要初始化
+	/*	Sets head;//结构体需要初始化
 	memset(&head, 0, sizeof(head));
 	head.howmany = n;
 	head.elements = 0;
 	Sets *follow = head.next;//结构体需要初始化
-*/
-	Sets *head = (Sets *)malloc(sizeof(*head));
+	*/
+    head = (Sets *)malloc(sizeof(*head));
 	Sets *follow = head->next;
-	head->howmany=n;
+	head->howmany = n;
 	for (int i = 0; i < n; i++)
 	{
 		follow = (Sets *)malloc(sizeof(*follow));//一定要开辟一个空间
@@ -58,7 +65,12 @@ Sets CreatSets()
 		follow = follow->next;
 	}
 	follow = NULL;
-	return *head;//局部变量问题
+	follow = head->next;
+	for(int i=0;i<n;i++)
+	{
+		cout<< follow->elements << "printf elements"<<endl;
+	}
+	//return head;//局部变量问题
 }
 Sets And_Sets(Sets *Sets1, Sets *Sets2)
 {
@@ -71,7 +83,7 @@ Sets And_Sets(Sets *Sets1, Sets *Sets2)
 	{
 		int front_element = P1->elements;
 		int j;
-		for ( j = 0; j<Sets2->howmany; j++)
+		for (j = 0; j<Sets2->howmany; j++)
 		{
 			if (front_element == P2->elements)
 			{
@@ -81,7 +93,7 @@ Sets And_Sets(Sets *Sets1, Sets *Sets2)
 		if (j == Sets2->howmany)
 		{
 			number++;
-			P3 =P3->next;
+			P3 = P3->next;
 			P3->elements = front_element;
 		}
 		P1 = P1->next;
@@ -90,7 +102,7 @@ Sets And_Sets(Sets *Sets1, Sets *Sets2)
 	for (int j = 0; j<Sets2->howmany; j++)
 	{
 		number++;
-		P3= P3->next;
+		P3 = P3->next;
 		P2 = P2->next;
 		P3->elements = P2->elements;
 	}
