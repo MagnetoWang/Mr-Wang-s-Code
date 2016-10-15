@@ -1,6 +1,7 @@
-include<iostream>
+#include<iostream>
 #include<queue>
 #include<fstream>
+#include<Windows.h>
 #define MAXSize 100
 const char *filename = "迷宫图.txt";
 using namespace std;
@@ -15,9 +16,10 @@ queue<Position> pane;
 //int direction[4][2]={{-1,0},{0,1},{1,0},{0,-1}};
 int dy[4] = { -1,0,1,0 };
 int dx[4] = { 0,1,0,-1 };
+int dist[MAXSize][MAXSize];
 int Creat_Maze(int(*Maze)[MAXSize], int &line, int &row, int &EntranceL, int &EntranceR, int &ExitL, int &ExitR);//line是行，row是列
 																												 //int Search_Path(char (*Maze)[MAXSize], int line, int row, int EnL, int EnR, int ExL, int ExR);//广度优先搜素
-int BFS(int(*Maze)[MAXSize]);
+int BFS(int(*Maze)[MAXSize], int line, int row);
 int main()
 {
 	int line, row;
@@ -25,13 +27,15 @@ int main()
 	//cout<<"输入"
 	//	int queue;
 	int maze[MAXSize][MAXSize] = { 0 };
-	bool IsthatOk = Creat_Maze(maze, line, row, EntranceL, EntranceR, ExitL, ExitR);
+	bool IsthatOk = (bool)Creat_Maze(maze, line, row, EntranceL, EntranceR, ExitL, ExitR);
 	Entrance.x = EntranceL;
 	Entrance.y = EntranceR;
 	Exit.x = ExitL;
 	Exit.y = ExitR;
-
+	int answer;
 	pane.push(Position(EntranceL, EntranceR));//z语法不熟悉
+	answer=BFS(maze,line,row);
+	cout << answer << endl;
 	//pane.push(EntranceL, EntranceR);
 	//bool IsitFound = Search_Path(maze, line, row, EntranceL, EntranceR, ExitL, ExitR);
 	int pause;
@@ -42,7 +46,7 @@ int Creat_Maze(int(*Maze)[MAXSize], int &line, int &row, int &EntranceL, int &En
 {
 	ifstream File_Maze;
 	File_Maze.open(filename);
-	int n;
+	//int n;
 	File_Maze >> line >> row;
 	int i = 0;
 	int j = 0;
@@ -72,7 +76,7 @@ int Creat_Maze(int(*Maze)[MAXSize], int &line, int &row, int &EntranceL, int &En
 }
 
 //int Search_Path(char (*Maze)[MAXSize], int line, int row, int EnL, int EnR, int ExL, int ExR)//广度优先搜素
-int BFS(int(*Maze)[MAXSize])
+int BFS(int(*Maze)[MAXSize],int line,int row)
 {
 
 	for (int i = 0; i<line; i++)
@@ -82,10 +86,12 @@ int BFS(int(*Maze)[MAXSize])
 			dist[i][j] = 10000;//距离拉大
 		}
 	}
+	int flag = 0;
 	dist[Entrance.x][Entrance.y] = 0;
 	while (pane.size())
 	{
-		Position Pane = pane.front();
+		
+	     Position Pane = pane.front();
 		if (Pane.first == Exit.x&&Pane.second == Exit.y)
 		{
 			break;
@@ -99,17 +105,25 @@ int BFS(int(*Maze)[MAXSize])
 		}
 		}*/
 		for (int i = 0; i<4; i++)
-		{
-			int nx = Entrance.x + dx[i];
-			int ny = Entrance.y + dy[i]
-				if (Maze[nx][ny] == 1 && 0 <= nx&&nx<line && 0 <= ny&&ny<row&&dist[nx][ny] == 10000)
+		{								 
+			int nx = Entrance.x + dx[i]; 
+			int ny = Entrance.y + dy[i]; 
+				//if (Maze[nx][ny] == 1 && 0 <= nx&&nx<line && 0 <= ny&&ny<row&&dist[nx][ny] == 10000)
+			     if(Maze[nx][ny]==1&&dist[nx][ny]==10000)//没有等于10000那个条件计算量达到30959
+			     //if(Maze[nx][ny] == 1)
 				{
-					Pane.push([nx][ny]);
+					pane.push(Position(nx,ny));
+					flag++;
 					dist[nx][ny] = dist[Entrance.x][Entrance.y] + 1;
+					//Sleep(2);
 
+					cout <<nx<<":"<<ny<<"   "<<flag<<":"<< dist[nx][ny]<<endl;
 
 				}
 		}
+		pane.pop();
+		Entrance.x= pane.front().first;
+		Entrance.y = pane.front().second;
 
 	}
 	return dist[Exit.x][Exit.y];
