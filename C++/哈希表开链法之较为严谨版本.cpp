@@ -50,9 +50,11 @@ bool insert_map(Data *Hash_Map[], int number)
 bool creat_hashmap(Data *Hash_Map[])
 {
 	int amount;
+	cout << "请输入创建数量" << endl;
 	cin >> amount;
 	for (int i=0; i <amount; i++)
 	{
+		cout << "输入数字" << endl;
 		int number;
 		cin >> number;
 		insert_map(Hash_Map, number);
