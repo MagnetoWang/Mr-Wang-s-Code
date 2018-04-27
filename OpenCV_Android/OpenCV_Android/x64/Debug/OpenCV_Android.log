@@ -1,0 +1,6 @@
+﻿  test.cpp
+c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\test.cpp(118): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\test.cpp(119): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\test.cpp(200): warning C4244: “=”: 从“double”转换到“uchar”，可能丢失数据
+  OpenCV_Android.vcxproj -> C:\Users\Magneto_Wang\Documents\GitHub\Mr-Wang-s-Code\OpenCV_Android\x64\Debug\OpenCV_Android.exe
+  OpenCV_Android.vcxproj -> C:\Users\Magneto_Wang\Documents\GitHub\Mr-Wang-s-Code\OpenCV_Android\x64\Debug\OpenCV_Android.pdb (Partial PDB)
