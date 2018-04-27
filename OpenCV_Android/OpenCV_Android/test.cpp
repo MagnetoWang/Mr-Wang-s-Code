@@ -68,7 +68,7 @@ Mat dst;
 int main() {
 	 //yourname();
 	//colorMap();
-	VS_Style();
+	//VS_Style();
 	//hsv_function();
 	int  i = 0;
 	cin >> i;
