@@ -10,11 +10,11 @@ using namespace std;
 using namespace cv;
 
 //----------------------------------------
-void printMatInfo(Mat img,string name);
+void printMatInfo(Mat img, string name);
 void printMat(Mat img);
-Mat IncreaseColor(Mat img,double Value);
+Mat IncreaseColor(Mat img, double Value);
 Mat Gamma(Mat image);
-
+Mat VS_TransferColor(Mat src);
 
 
 void correcting(Mat src);
@@ -29,44 +29,44 @@ RNG rng(12345);
 
 
 void yourname();
-void callBack(int, void*) ;
+void callBack(int, void*);
 void hsv_function();
 void colorMap();
 Mat TransferColor(Mat src);
 
 void VS_Style();
-
+void VS_Result();
 
 
 
 //色相  
-int hmin = 0;  
-int hmin_Max = 360;  
-int hmax = 360;  
-int hmax_Max = 360;  
+int hmin = 0;
+int hmin_Max = 360;
+int hmax = 360;
+int hmax_Max = 360;
 //饱和度  
-int smin = 0;  
-int smin_Max = 255;  
-int smax = 255;  
-int smax_Max = 255;  
+int smin = 0;
+int smin_Max = 255;
+int smax = 255;
+int smax_Max = 255;
 //亮度  
-int vmin = 106;  
-int vmin_Max = 255;  
-int vmax = 250;  
-int vmax_Max = 255;  
+int vmin = 106;
+int vmin_Max = 255;
+int vmax = 250;
+int vmax_Max = 255;
 //显示原图的窗口  
-string windowName = "src";  
+string windowName = "src";
 //输出图像的显示窗口  
-string dstName = "dst";  
+string dstName = "dst";
 
 //输入图像  
-Mat img =imread("name13.jpg");
+Mat img = imread("name13.jpg");
 //灰度值归一化  
-Mat bgr;  
+Mat bgr;
 //HSV图像  
-Mat hsv;  
+Mat hsv;
 //输出图像  
-Mat dst;  
+Mat dst;
 
 
 
@@ -76,11 +76,12 @@ Mat dst;
 
 int main() {
 	Mat img;
-	 img = imread("name26.jpg");
-	 resize(img,img,Size(800,800));
-	 //yourname();
+	img = imread("name26.jpg");
+	resize(img, img, Size(800, 800));
+	//yourname();
 	//colorMap();
-	VS_Style();
+	// VS_Style();
+	VS_Result();
 	//hsv_function();
 	// TransferColor();
 	// IncreaseColor(img,100.0);
@@ -88,16 +89,16 @@ int main() {
 	int  i = 0;
 	cin >> i;
 
-	 img = imread("adjust14.jpg");
+	img = imread("adjust14.jpg");
 	//img = imread("rotation2.jpg");
 	//Hough(img);
 	printMat(img);
 	Mat result(800, 800, CV_32F);
 	resize(img, result, result.size(), 1, 1);
 	printMat(result);
-	 ExcellentCorrecting(result);
+	ExcellentCorrecting(result);
 	//Rotation(result);
-
+	return 0;
 }
 //打印Mat的详细信息，长和宽
 void printMat(Mat img) {
@@ -105,19 +106,19 @@ void printMat(Mat img) {
 }
 void Rotation(Mat img) {
 	Mat srcImg = img;
-    imshow("原始图", srcImg);
-    Mat gray, binImg;
-    //灰度化
-    cvtColor(srcImg, gray, COLOR_RGB2GRAY);
-    imshow("灰度图", gray);
-    //二值化
-    threshold(gray, binImg, 100, 200, CV_THRESH_BINARY);
-    imshow("二值化", binImg);
-	 vector<vector<Point> > contours;
-    vector<Rect> boundRect(contours.size());
-    //注意第5个参数为CV_RETR_EXTERNAL，只检索外框  
-    findContours(binImg, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE); //找轮廓
-    cout << contours.size() << endl;
+	imshow("原始图", srcImg);
+	Mat gray, binImg;
+	//灰度化
+	cvtColor(srcImg, gray, COLOR_RGB2GRAY);
+	imshow("灰度图", gray);
+	//二值化
+	threshold(gray, binImg, 100, 200, CV_THRESH_BINARY);
+	imshow("二值化", binImg);
+	vector<vector<Point> > contours;
+	vector<Rect> boundRect(contours.size());
+	//注意第5个参数为CV_RETR_EXTERNAL，只检索外框  
+	findContours(binImg, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE); //找轮廓
+	cout << contours.size() << endl;
 	for (int i = 0; i < contours.size(); i++)
 	{
 		//需要获取的坐标  
@@ -125,9 +126,9 @@ void Rotation(Mat img) {
 		CvBox2D rect = minAreaRect(Mat(contours[i]));
 
 		cvBoxPoints(rect, rectpoint); //获取4个顶点坐标  
-		//与水平线的角度  
+									  //与水平线的角度  
 		float angle = rect.angle;
-		cout <<"angle : "<< angle << endl;
+		cout << "angle : " << angle << endl;
 
 		int line1 = sqrt((rectpoint[1].y - rectpoint[0].y)*(rectpoint[1].y - rectpoint[0].y) + (rectpoint[1].x - rectpoint[0].x)*(rectpoint[1].x - rectpoint[0].x));
 		int line2 = sqrt((rectpoint[3].y - rectpoint[0].y)*(rectpoint[3].y - rectpoint[0].y) + (rectpoint[3].x - rectpoint[0].x)*(rectpoint[3].x - rectpoint[0].x));
@@ -147,8 +148,8 @@ void Rotation(Mat img) {
 		//新建一个感兴趣的区域图，大小跟原图一样大  
 		Mat RoiSrcImg(srcImg.rows, srcImg.cols, CV_8UC3); //注意这里必须选CV_8UC3
 		RoiSrcImg.setTo(0); //颜色都设置为黑色  
-		//imshow("新建的ROI", RoiSrcImg);
-		//对得到的轮廓填充一下  
+							//imshow("新建的ROI", RoiSrcImg);
+							//对得到的轮廓填充一下  
 		drawContours(binImg, contours, -1, Scalar(255), CV_FILLED);
 
 		//抠图到RoiSrcImg
@@ -212,7 +213,7 @@ void ExcellentCorrecting(Mat src) {
 		for (int j = 0; j < imageGray.cols; j++)
 		{
 			imageGray.at<uchar>(i, j) = pow((imageGray.at<uchar>(i, j)), 0.5);
-			
+
 		}
 	}
 	normalize(imageGray, imageGray, 0, 255, CV_MINMAX);
@@ -222,27 +223,27 @@ void ExcellentCorrecting(Mat src) {
 	GaussianBlur(imageGray, imageGray, Size(5, 5), 2);
 	Mat element = getStructuringElement(MORPH_ELLIPSE, Size(30, 30));
 	//加入闭运算可以有效的处理边界为连接的问题
-	morphologyEx(imageGray, imageGray, MORPH_CLOSE , element);
-	
-// 	MORPH_OPEN： 开运算 
-// MORPH_CLOSE ：闭运算 
-// MORPH_GRADIENT： 形态学梯度 
-// MORPH_TOPHAT：顶帽运算 
-// MORPH_BLACKHAT： 黑帽运算 
-// MORPH_ERODE ：腐蚀运算 
-// MORPH_DILATE ：膨胀运算 
-// MORPH_HITMISS: 击中击不中运算(只支持CV_8UC1类型的二值图像)
-	
+	morphologyEx(imageGray, imageGray, MORPH_CLOSE, element);
+
+	// 	MORPH_OPEN： 开运算 
+	// MORPH_CLOSE ：闭运算 
+	// MORPH_GRADIENT： 形态学梯度 
+	// MORPH_TOPHAT：顶帽运算 
+	// MORPH_BLACKHAT： 黑帽运算 
+	// MORPH_ERODE ：腐蚀运算 
+	// MORPH_DILATE ：膨胀运算 
+	// MORPH_HITMISS: 击中击不中运算(只支持CV_8UC1类型的二值图像)
+
 	imshow("开运算", imageGray);
 	Canny(imageGray, imageGray, 50, 200, 5);//这里参数非常重要。决定后面轮廓的效果
-	
+
 	vector<vector<Point>> contours;
 	vector<Vec4i> hierarchy;
 	findContours(imageGray, contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point());
 
 
 	Mat Wang_mark(src.size(), CV_32S, cv::Scalar(0));
-	Mat	Wang_Contours=Mat::zeros(src.size(), CV_8UC1);
+	Mat	Wang_Contours = Mat::zeros(src.size(), CV_8UC1);
 	Mat Wang_Rect(src.size(), src.type(), cv::Scalar(0));
 	Mat Wang_8UC1 = Mat::zeros(src.size(), imageGray.type());
 	Mat Wang_Output(src.size(), CV_8UC3, cv::Scalar(0));
@@ -256,7 +257,7 @@ void ExcellentCorrecting(Mat src) {
 		//长度确定最大矩形周长，面积确定是否闭合。这样才能选择出想要的矩阵图形出来。缺一不可
 		//目前并没有很好检测，可以直接提取矩形，只能近似。
 		//所以仍然存在不完美
-		if (maxLength < arcLength(contours[i], true)&& maxArea<contourArea(contours[i])) {
+		if (maxLength < arcLength(contours[i], true) && maxArea<contourArea(contours[i])) {
 			maxLength = arcLength(contours[i], true);
 			maxArea = contourArea(contours[i]);
 			maxIndex = i;
@@ -317,15 +318,15 @@ void ExcellentCorrecting(Mat src) {
 	//maxIndex = SecondIndex;
 
 
-	
-	cout <<" arcLength(contours[maxIndex], true):"<< arcLength(contours[maxIndex], true) << "contourArea(contours[i]) :"<<contourArea(contours[maxIndex]) << endl;
-	drawContours(Wang_Rect, contours, maxIndex, Scalar(255,255,255), 1, 8, hierarchy);
+
+	cout << " arcLength(contours[maxIndex], true):" << arcLength(contours[maxIndex], true) << "contourArea(contours[i]) :" << contourArea(contours[maxIndex]) << endl;
+	drawContours(Wang_Rect, contours, maxIndex, Scalar(255, 255, 255), 1, 8, hierarchy);
 	imshow("Wang_Rect", Wang_Rect);
 
-	
-	
-	
-	
+
+
+
+
 	imshow("Wang_Contours", Wang_Contours);
 	convertScaleAbs(Wang_Rect, Wang_8UC1);
 	drawContours(Wang_8UC1, contours, maxIndex, Scalar(255, 255, 255), CV_FILLED);//填充遮罩层
@@ -359,8 +360,8 @@ void ExcellentCorrecting(Mat src) {
 
 	//轮廓中的内容提取，足足浪费我一个下午的时间。不管用循环还是copyto什么的，还有图像融合之类的。都有很大问题。
 	//还是用第三方clone，再来循环复制。
-	Wang_Output=Wang_8UC1.clone();
-	cout << Wang_8UC1.size() << endl << Wang_Output.size()<<endl;
+	Wang_Output = Wang_8UC1.clone();
+	cout << Wang_8UC1.size() << endl << Wang_Output.size() << endl;
 	// src.copyTo(Wang_Output, Wang_8UC1);
 	imshow("Wang_Output", Wang_Output);
 	for (int i = 0; i<Wang_Output.rows; i++)
@@ -368,7 +369,7 @@ void ExcellentCorrecting(Mat src) {
 		for (int j = 0; j<Wang_Output.cols; j++)
 		{
 			/*其中<>内应填入m0元素的数据类型，uchar对应的是CV_8U，char对应的是CV_8S，int对应的是CV_32S，float对应的是CV_32F，double对应的是CV_64F。
-				若m0是多通道矩阵，则数据类型应为Vec3b, c为当前处理的通道序号。i，j，c都是从零开始的。*/
+			若m0是多通道矩阵，则数据类型应为Vec3b, c为当前处理的通道序号。i，j，c都是从零开始的。*/
 			Vec3b index = Wang_Output.at<Vec3b>(i, j);
 
 			if (index == Vec3b(255, 255, 255))
@@ -377,7 +378,7 @@ void ExcellentCorrecting(Mat src) {
 			}
 			else
 			{
-				src.at<Vec3b>(i, j) = Vec3b(0,0,0);
+				src.at<Vec3b>(i, j) = Vec3b(0, 0, 0);
 			}
 		}
 	}
@@ -392,11 +393,11 @@ void ExcellentCorrecting(Mat src) {
 
 }
 void correcting(Mat src) {
-	Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
+	Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 	int g_CannyThred = 150, g_CannyP = 0, g_CannySize = 0, g_HoughThred = 100, g_HoughThick = 0;
 	int g_Blue = 255, g_Green = 255, g_Red = 0;
 	int g_nWay = 0, g_nValue = 1000;
-	
+
 	Mat imageGray;
 	vector<Vec2f> lines;
 	cvtColor(src, imageGray, CV_RGB2GRAY);
@@ -406,32 +407,32 @@ void correcting(Mat src) {
 	morphologyEx(imageGray, imageGray, MORPH_CLOSE, element);
 	imshow("增强图像", imageGray);
 	Canny(imageGray, imageGray, 100, 200, 5);//这里参数非常重要。决定后面轮廓的效果
-	//Mat grad_x, abs_grad_x;
-	//Mat grad_y, abs_grad_y;
-	//Sobel(imageGray, grad_x, CV_8S, 1, 0, 3, 1, 1, BORDER_DEFAULT);
-	//Sobel(imageGray, grad_y, CV_8S, 0, 1, 3, 1, 1, BORDER_DEFAULT);
-	//convertScaleAbs(grad_x, abs_grad_x);
-	//convertScaleAbs(grad_y, abs_grad_y);
-	//addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, imageGray);
-	//imshow("【效果图】整体方向Sobel", imageGray);
-	//printMatValue(imageGray);
-	//for (int i = 0; i<imageGray.rows; i++)
-	//{
-	//	for (int j = 0; j<imageGray.cols; j++)
-	//	{
-	//		int index = imageGray.at<int>(i, j);
+											 //Mat grad_x, abs_grad_x;
+											 //Mat grad_y, abs_grad_y;
+											 //Sobel(imageGray, grad_x, CV_8S, 1, 0, 3, 1, 1, BORDER_DEFAULT);
+											 //Sobel(imageGray, grad_y, CV_8S, 0, 1, 3, 1, 1, BORDER_DEFAULT);
+											 //convertScaleAbs(grad_x, abs_grad_x);
+											 //convertScaleAbs(grad_y, abs_grad_y);
+											 //addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, imageGray);
+											 //imshow("【效果图】整体方向Sobel", imageGray);
+											 //printMatValue(imageGray);
+											 //for (int i = 0; i<imageGray.rows; i++)
+											 //{
+											 //	for (int j = 0; j<imageGray.cols; j++)
+											 //	{
+											 //		int index = imageGray.at<int>(i, j);
 
-	//		if (index != 0)
-	//		{
-	//			imageGray.at<int>(i, j) =10;
-	//		}
-	//		else
-	//		{
-	//			imageGray.at<int>(i, j) = 0;
-	//		}
-	//	}
-	//}
-		//imshow("增强图像", imageGray);
+											 //		if (index != 0)
+											 //		{
+											 //			imageGray.at<int>(i, j) =10;
+											 //		}
+											 //		else
+											 //		{
+											 //			imageGray.at<int>(i, j) = 0;
+											 //		}
+											 //	}
+											 //}
+											 //imshow("增强图像", imageGray);
 
 
 	vector<vector<Point>> contours;
@@ -439,7 +440,7 @@ void correcting(Mat src) {
 	findContours(imageGray, contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point());
 	cout << "imageGray type : " << imageGray.type() << endl;
 	Mat imageContours = Mat::zeros(src.size(), CV_8UC1);  //轮廓
-	
+
 
 	Mat imageMask(src.size(), CV_8U, cv::Scalar(0));
 
@@ -462,26 +463,26 @@ void correcting(Mat src) {
 	//	drawContours(mark1, contours, index, Scalar::all(compCount + 1), 1, 8, hierarchy);
 	//	drawContours(imageContours, contours, index, Scalar(255), 1, 8, hierarchy);
 	//}
-		double max = 0;
-		int maxIndex = 0;
-		for (int i = 0; i < contours.size(); i++) {
-			if (max < arcLength(contours[i],true)) {
-				max = arcLength(contours[i], true);
-				maxIndex = i;
-			}
-			drawContours(mark1, contours, i, Scalar::all(i + 1), 1, 8, hierarchy);
-			drawContours(imageContours, contours, i, Scalar(255), 1, 8, hierarchy);
-			//cout << contourArea(contours[i]) << endl;
-			//drawContours(Wang_Mat, contours, i, Scalar::all(i + 1), 1, 8, hierarchy);//为什么要这样画？
-
-
+	double max = 0;
+	int maxIndex = 0;
+	for (int i = 0; i < contours.size(); i++) {
+		if (max < arcLength(contours[i], true)) {
+			max = arcLength(contours[i], true);
+			maxIndex = i;
 		}
-		cout << arcLength(contours[maxIndex], true) << endl;
-		/*drawContours(mark1, contours, maxIndex, Scalar::all(compCount + 1), 1, 8, hierarchy);*/
-		drawContours(imageContours, contours, maxIndex, Scalar(255), 1, 8, hierarchy);
-		drawContours(mark1, contours, maxIndex, Scalar::all(maxIndex + 1), 1, 8, hierarchy);
-		drawContours(Wang_Mat, contours, maxIndex, Scalar::all(maxIndex + 1), 1, 8, hierarchy);
-		
+		drawContours(mark1, contours, i, Scalar::all(i + 1), 1, 8, hierarchy);
+		drawContours(imageContours, contours, i, Scalar(255), 1, 8, hierarchy);
+		//cout << contourArea(contours[i]) << endl;
+		//drawContours(Wang_Mat, contours, i, Scalar::all(i + 1), 1, 8, hierarchy);//为什么要这样画？
+
+
+	}
+	cout << arcLength(contours[maxIndex], true) << endl;
+	/*drawContours(mark1, contours, maxIndex, Scalar::all(compCount + 1), 1, 8, hierarchy);*/
+	drawContours(imageContours, contours, maxIndex, Scalar(255), 1, 8, hierarchy);
+	drawContours(mark1, contours, maxIndex, Scalar::all(maxIndex + 1), 1, 8, hierarchy);
+	drawContours(Wang_Mat, contours, maxIndex, Scalar::all(maxIndex + 1), 1, 8, hierarchy);
+
 
 	Mat marksShows;
 	convertScaleAbs(mark1, marksShows);//，使用线性变换转换输入数组元素成8位无符号整型。
@@ -494,7 +495,7 @@ void correcting(Mat src) {
 	HoughLines(imageContours, lines, (double)g_CannyThred, (double)((g_CannyThred + 1) * (2 + g_CannyP / 100.0)), 3);
 
 	//imshow("霍夫变换", imageContours);
-	
+
 	watershed(src, mark1);
 	imshow("Aftermark1", mark1);
 	Mat Wang_32S;
@@ -510,7 +511,7 @@ void correcting(Mat src) {
 			max = arcLength(contours[i], true);
 			maxIndex = i;
 		}
-	/*	Rect rect = cvBoundingRect(contours, 0);
+		/*	Rect rect = cvBoundingRect(contours, 0);
 		cvRectangle(imgSrc, cvPoint(rect.x, rect.y), cvPoint(rect.x + rect.width, rect.y + rect.height), cvScalar(0, 0, 0), 0);*/
 		/*drawContours(Wang_Contours, contours, i, Scalar(255), 1, 8, hierarchy);*/
 		cout << "轮廓  " << i << " : " << arcLength(contours[i], true) << endl;
@@ -521,9 +522,9 @@ void correcting(Mat src) {
 	cout << "maxIndex  " << maxIndex << " : " << arcLength(contours[index], true);
 	drawContours(Wang_Contours, contours, maxIndex, color, 1, 8, hierarchy);
 	imshow("Wang_Contours", Wang_Contours);
-	Mat Wang_Output=Mat::zeros(src.size(), CV_8UC3);
-	Mat Wang_8UC3= Mat::zeros(src.size(), CV_8UC3);
-	
+	Mat Wang_Output = Mat::zeros(src.size(), CV_8UC3);
+	Mat Wang_8UC3 = Mat::zeros(src.size(), CV_8UC3);
+
 	Wang_Contours.convertTo(Wang_8UC3, CV_8UC3);
 	imshow("Wang_8UC3", Wang_8UC3);
 	//addWeighted(src, 0.4, Wang_8UC3, 0.6, 0, Wang_Output);
@@ -544,7 +545,7 @@ void correcting(Mat src) {
 	watershed(src, Wang_Mat);//32位，单通道输出的图像
 	imshow("AfteimageWang_Mat", Wang_Mat);
 
-	
+
 	//convertScaleAbs(Wang_Mat, Wang_8UC1);
 	//imshow("After Watershed Wang_8UC1", Wang_8UC1);
 
@@ -574,7 +575,7 @@ void correcting(Mat src) {
 
 			if (mark1.at<int>(i, j) == -1)
 			{
-				PerspectiveImage.at<Vec3b>(i, j) = Vec3b(255,255,255);
+				PerspectiveImage.at<Vec3b>(i, j) = Vec3b(255, 255, 255);
 			}
 			else
 			{
@@ -587,7 +588,7 @@ void correcting(Mat src) {
 	//分割并填充颜色的结果跟原始图像融合  
 	Mat wshed;
 	addWeighted(src, 0.4, PerspectiveImage, 0.6, 0, wshed);
-	
+
 	imshow("AddWeighted Image", wshed);
 
 	cvtColor(PerspectiveImage, PerspectiveImage, CV_RGB2GRAY);
@@ -610,18 +611,18 @@ void correcting(Mat src) {
 	//	0，第一个外轮廓
 	//	- 1：第一个外轮廓及包含的内轮廓
 	//	- 2：第一个外轮廓及包含的内轮廓及里面的内轮廓
-		//findContours(imageGray, contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, Point());
+	//findContours(imageGray, contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, Point());
 	cout << "找第二次轮廓";
 	max = 0;
 	maxIndex = 0;
-	Mat twice_Contours= Mat::zeros(PerspectiveImage.size(), CV_8UC1);
+	Mat twice_Contours = Mat::zeros(PerspectiveImage.size(), CV_8UC1);
 	for (int i = 0; i < contours.size(); i++) {
 		if (max < contourArea(contours[i])) {
 			max = contourArea(contours[i]);
 			maxIndex = i;
 		}
 		drawContours(twice_Contours, contours, i, Scalar(255), 1, 8, hierarchy);
-		cout <<"轮廓  "<<i<<" : "<< contourArea(contours[i]) << endl;
+		cout << "轮廓  " << i << " : " << contourArea(contours[i]) << endl;
 
 	}
 	//printMatValue(twice_Contours);
@@ -643,12 +644,12 @@ void correcting(Mat src) {
 
 	imageMask.convertTo(imageMask, CV_32S);
 	watershed(src, imageMask);
-	imshow("imageMask",imageMask);
+	imshow("imageMask", imageMask);
 	//waitKey(0);
 
 	imshow("src", src);
 	//waitKey(0);
-	
+
 	imageMask.convertTo(mark1, CV_8U);
 
 	imshow("marker", mark1);
@@ -662,8 +663,8 @@ void correcting(Mat src) {
 
 	Mat imglabels = src;
 	cvtColor(src, src, CV_BGR2GRAY);
-	
-	
+
+
 	//imshow("灰度化",src);
 	//waitKey(0);
 	//adaptiveThreshold(src, src, 256, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 41, 0);
@@ -711,7 +712,7 @@ void Hough(Mat srcImage) {
 	int g_CannyThred = 150, g_CannyP = 0, g_CannySize = 0, g_HoughThred = 100, g_HoughThick = 0;
 	int g_Blue = 255, g_Green = 255, g_Red = 0;
 	int g_nWay = 0, g_nValue = 1000;
-	
+
 	imshow("【原图】", srcImage);
 
 	Mat grayImage;
@@ -952,9 +953,9 @@ void Hough(Mat srcImage) {
 void yourname() {
 	Mat src;
 	src = imread("name3.jpg");
-	imshow("原始图",src);
+	imshow("原始图", src);
 	Mat img;
-	resize(src, img, Size(800,800),1,1);
+	resize(src, img, Size(800, 800), 1, 1);
 
 	imshow("800X800图", img);
 	cvtColor(img, img, COLOR_BGR2HSV);
@@ -970,33 +971,33 @@ void yourname() {
 
 
 	equalizeHist(RGB_channels[2], RGB_channels[2]);
-	merge(RGB_channels,3, img);
+	merge(RGB_channels, 3, img);
 	imshow("分离图", img);
-	inRange(img, Scalar(60, 43, 46), Scalar(260,255,255), img);
-	imshow("掩码天空",img);
+	inRange(img, Scalar(60, 43, 46), Scalar(260, 255, 255), img);
+	imshow("掩码天空", img);
 	medianBlur(img, img, 9);
 	imshow("掩码天空，中值滤波", img);
 
-	Mat kernel(5, 5,CV_8U);
+	Mat kernel(5, 5, CV_8U);
 	morphologyEx(img, img, MORPH_OPEN, kernel, Point(-1, -1), 10);
-	medianBlur(img, img, 9 );
+	medianBlur(img, img, 9);
 	imshow("多边形", img);
 
 	//找轮廓
 	vector<vector<Point> > contours;
-    vector<Vec4i> hierarchy;
+	vector<Vec4i> hierarchy;
 	//findContours(img, contours, hierarchy,CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-	cout << endl <<" img.channels "<< img.channels() << endl;
+	cout << endl << " img.channels " << img.channels() << endl;
 	//cout << endl << " img.size " << img. << endl;
-	
+
 
 	findContours(img, contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	imshow("img", img);
 
 	Rect boundRect;
 	Mat Wang_Rect(img.size(), src.type(), cv::Scalar(0));
-	
-	
+
+
 	//drawContours(Wang_Rect, contours, 0, Scalar(255,255,255), CV_FILLED, 8, hierarchy);
 	//imshow("Wang_Rect",Wang_Rect);
 	//waitKey(0);
@@ -1010,7 +1011,7 @@ void yourname() {
 	//	int 	shift = 0
 	//)
 
-	rectangle(Wang_Rect, boundRect, Scalar(255, 255, 255), 1,8,0);
+	rectangle(Wang_Rect, boundRect, Scalar(255, 255, 255), 1, 8, 0);
 
 	imshow("Wang_Rect", Wang_Rect);
 
@@ -1056,9 +1057,9 @@ void yourname() {
 	//	MIXED_CLONE The classic method, color - based selection and alpha masking might be time consuming and often leaves an undesirable halo.Seamless cloning, even averaged with the original image, is not effective.Mixed seamless cloning based on a loose selection proves effective.
 	//	MONOCHROME_TRANSFER Monochrome transfer allows the user to easily replace certain features of one object by alternative features.
 	Mat result(sky.size(), sky.type(), cv::Scalar(0));
-	seamlessClone(sky,src_clone,  img, p, result, NORMAL_CLONE);
+	seamlessClone(sky, src_clone, img, p, result, NORMAL_CLONE);
 	imshow("result", result);
-	
+
 	imwrite("yourname.jpg", result);
 	Mat org = imread("原始色图.jpg");
 	Mat filter = imread("新海诚.jpg");
@@ -1079,7 +1080,7 @@ void yourname() {
 			Vec3b c_v = result.at<Vec3b>(i, j);
 			int x = c_v.val[1] / 4 + (c_v.val[0] / 32) * 64;
 			int y = c_v.val[2] / 4 + (c_v.val[0] % 4) * 64;
-	/*		x = x % 500;
+			/*		x = x % 500;
 			y = y % 500;*/
 			result.at<Vec3b>(i, j) = filter.at<Vec3b>(x, y);
 
@@ -1121,7 +1122,7 @@ void yourname() {
 
 
 	// hsv_function();
-	
+
 
 
 
@@ -1129,8 +1130,8 @@ void yourname() {
 	waitKey(0);
 }
 
-void colorMap(){
-	Mat result=imread("yourname.jpg");
+void colorMap() {
+	Mat result = imread("yourname.jpg");
 	Mat test = imread("yourname.jpg");
 
 
@@ -1138,7 +1139,7 @@ void colorMap(){
 	Mat canny_img;
 	bilateralFilter(test, canny_img, 5, 150, 150);
 	bilateralFilter(canny_img, test, 5, 150, 150);
-	
+
 	Mat src;
 	cvtColor(test, src, CV_BGR2GRAY);
 	//粗线，越大越粗，但是会有大量噪点  
@@ -1186,7 +1187,7 @@ void colorMap(){
 	imshow("canny_img", canny_img);
 	for (int i = 1; i < canny_img.rows; i++) {
 		for (int j = 1; j < canny_img.cols; j++) {
-			Vec3b c_v=canny_img.at<Vec3b>(i, j) ;
+			Vec3b c_v = canny_img.at<Vec3b>(i, j);
 			c_v.val[1] *= 2;
 			canny_img.at<Vec3b>(i, j) = c_v;
 
@@ -1210,9 +1211,9 @@ void colorMap(){
 	//	proportional to sigmaSpace.
 	//	@param borderType border mode used to extrapolate pixels outside of the image, see cv::BorderTypes
 	bilateralFilter(result, canny_img, 10, 50, 50, 4);
-	
+
 	imshow("双边滤波 result", canny_img);
-	
+
 
 
 
@@ -1257,7 +1258,7 @@ void colorMap(){
 			int mixPixel = c_v.val[0];
 			int basePixel = (c_v.val[0] + c_v.val[1] + c_v.val[2]) / 3;
 			res = 255 - (255 - mixPixel) * (255 - basePixel) / 255;
-			c_v.val[0] =min(255, max(0, res));
+			c_v.val[0] = min(255, max(0, res));
 			mixPixel = c_v.val[1];
 			res = 255 - (255 - mixPixel) * (255 - basePixel) / 255;
 			c_v.val[1] = min(255, max(0, res));
@@ -1266,7 +1267,7 @@ void colorMap(){
 			c_v.val[2] = min(255, max(0, res));
 			//int x = c_v.val[1] / 4 + (c_v.val[0] / 32) * 64;
 			//int y = c_v.val[2] / 4 + (c_v.val[0] % 4) * 64;
-	/*		x = x % 500;
+			/*		x = x % 500;
 			y = y % 500;*/
 			result.at<Vec3b>(i, j) = c_v;//filter.at<Vec3b>(x, y);
 
@@ -1297,35 +1298,35 @@ void hsv_function() {
 	createTrackbar("vmax", dstName, &vmax, vmax_Max, callBack);
 }
 //回调函数  
-void callBack(int, void*)  
-{	
-	
-    //输出图像分配内存  
-    dst = Mat::zeros(img.size(), CV_32FC3);  
-    //掩码  
-    Mat mask;  
-    inRange(hsv, Scalar(hmin, smin / float(smin_Max), vmin / float(vmin_Max)), Scalar(hmax, smax / float(smax_Max), vmax / float(vmax_Max)), mask);  
-    //只保留  
-    for (int r = 0; r < bgr.rows; r++)  
-    {  
-        for (int c = 0; c < bgr.cols; c++)  
-        {  
-            if (mask.at<uchar>(r, c) == 255)  
-            {  
-                dst.at<Vec3f>(r, c) = bgr.at<Vec3f>(r, c);  
-            }  
-        }  
-    }  
-    //输出图像  
-    imshow(dstName, dst);  
-    //保存图像  
-    dst.convertTo(dst, CV_8UC3, 255.0, 0);  
-    imwrite("HSV_inRange.jpg", dst);  
-}  
+void callBack(int, void*)
+{
 
-Mat TransferColor(Mat src){
+	//输出图像分配内存  
+	dst = Mat::zeros(img.size(), CV_32FC3);
+	//掩码  
+	Mat mask;
+	inRange(hsv, Scalar(hmin, smin / float(smin_Max), vmin / float(vmin_Max)), Scalar(hmax, smax / float(smax_Max), vmax / float(vmax_Max)), mask);
+	//只保留  
+	for (int r = 0; r < bgr.rows; r++)
+	{
+		for (int c = 0; c < bgr.cols; c++)
+		{
+			if (mask.at<uchar>(r, c) == 255)
+			{
+				dst.at<Vec3f>(r, c) = bgr.at<Vec3f>(r, c);
+			}
+		}
+	}
+	//输出图像  
+	imshow(dstName, dst);
+	//保存图像  
+	dst.convertTo(dst, CV_8UC3, 255.0, 0);
+	imwrite("HSV_inRange.jpg", dst);
+}
+
+Mat TransferColor(Mat src) {
 	cout << "TransferColor enter" << endl;
-	Mat colorBlue=imread("sky12.jpg");
+	Mat colorBlue = imread("sky12.jpg");
 	// Mat src=imread("name29.jpg");
 	resize(src, src, Size(800, 800));
 	resize(colorBlue, colorBlue, Size(800, 800));
@@ -1336,15 +1337,15 @@ Mat TransferColor(Mat src){
 	cvtColor(src, src, COLOR_BGR2Lab);
 	imshow("src_Lab", src);
 	imshow("colorBlue_Lab", colorBlue);
-	 //waitKey(0);
+	//waitKey(0);
 	//Scalar src_tempVal = cv::mean(src);
 	//Scalar colorBlue_tempVal = cv::mean(colorBlue);
 	Mat src_mean, src_Std;
 	Mat colorBlue_mean, colorBlue_Std;
-	meanStdDev(src, src_mean, src_Std,noArray());
+	meanStdDev(src, src_mean, src_Std, noArray());
 	meanStdDev(colorBlue, colorBlue_mean, colorBlue_Std, noArray());
-	printMatInfo(colorBlue,"colorBlue");
-	printMatInfo(src,"src");
+	printMatInfo(colorBlue, "colorBlue");
+	printMatInfo(src, "src");
 	printMatInfo(src_mean, "src_mean");
 	printMatInfo(src_Std, "src_Std");
 	printMatInfo(colorBlue_mean, "colorBlue_mean");
@@ -1352,51 +1353,36 @@ Mat TransferColor(Mat src){
 	printMat(src_mean);
 	printMat(colorBlue_mean);
 	//waitKey(0);
-	
+
 	//颜色映射
 	//Size(cols, rows) opencv的api我真是无语了。幸好之前的都800*800的大小
 	//列，行 不是 行，列
 	for (int i = 0; i < src.cols; i++) {
 		for (int j = 0; j < src.rows; j++) {
-			 
+
 			for (int channels = 0; channels < 3; channels++) {
 				double pix = src.at<Vec3b>(i, j)[channels];
 				//Vec3b c_v = result.at<Vec3b>(i, j);
-				double cm = colorBlue_mean.at<double>( channels,0);
+				double cm = colorBlue_mean.at<double>(channels, 0);
 				double cs = colorBlue_Std.at<double>(channels, 0);
 				double sm = src_mean.at<double>(channels, 0);
 				double ss = src_Std.at<double>(channels, 0);
-	/*			首先，将源图像原有的数据减掉源图像的均值
-
-					L = l – ml
-
-					A = a – ma
-
-					B = b – mb
-
-					再将得到的新数据按比例放缩，其放缩系数是两幅图像标准方差的比值
-
-					L’ = (nl’ / nl)* L
-
-					A’ = (na’ / na)* A
-
-					B’ = (nb’ / nb)* B
-
-					将得到的l’、a’、b’分别加上目标图像三个通道的均值，得到最终数据
-
-					L = L’ + ml’
-
-					A = A’ + ma’
-
-					B = B’ + mb’
-
-					整理后得到目标图像与源图像之间的像素关系表达
-
-					L = (nl’ / nl)* (l – ml) + ml’
-
-					A = (na’ / na)* (a – ma) + ma’
-
-					B = (nb’ / nb)* (b – mb) + mb’*/
+				/*			首先，将源图像原有的数据减掉源图像的均值
+				L = l – ml
+				A = a – ma
+				B = b – mb
+				再将得到的新数据按比例放缩，其放缩系数是两幅图像标准方差的比值
+				L’ = (nl’ / nl)* L
+				A’ = (na’ / na)* A
+				B’ = (nb’ / nb)* B
+				将得到的l’、a’、b’分别加上目标图像三个通道的均值，得到最终数据
+				L = L’ + ml’
+				A = A’ + ma’
+				B = B’ + mb’
+				整理后得到目标图像与源图像之间的像素关系表达
+				L = (nl’ / nl)* (l – ml) + ml’
+				A = (na’ / na)* (a – ma) + ma’
+				B = (nb’ / nb)* (b – mb) + mb’*/
 
 				pix = (pix - sm)*(cs / ss) + cm;
 
@@ -1424,32 +1410,32 @@ Mat TransferColor(Mat src){
 
 
 
-//src_mean:
-//	img.type() : 6
-//		img.size() : [1 x 3]
-//		img.channels() : 1
-//		img.depth() : 6
-//
-//
-//		src_Std :
-//		img.type() : 6
-//		img.size() : [1 x 3]
-//		img.channels() : 1
-//		img.depth() : 6
-//
-//
-//		colorBlue_mean :
-//		img.type() : 6
-//		img.size() : [1 x 3]
-//		img.channels() : 1
-//		img.depth() : 6
-//
-//
-//		colorBlue_Std :
-//		img.type() : 6
-//		img.size() : [1 x 3]
-//		img.channels() : 1
-//		img.depth() : 6
+	//src_mean:
+	//	img.type() : 6
+	//		img.size() : [1 x 3]
+	//		img.channels() : 1
+	//		img.depth() : 6
+	//
+	//
+	//		src_Std :
+	//		img.type() : 6
+	//		img.size() : [1 x 3]
+	//		img.channels() : 1
+	//		img.depth() : 6
+	//
+	//
+	//		colorBlue_mean :
+	//		img.type() : 6
+	//		img.size() : [1 x 3]
+	//		img.channels() : 1
+	//		img.depth() : 6
+	//
+	//
+	//		colorBlue_Std :
+	//		img.type() : 6
+	//		img.size() : [1 x 3]
+	//		img.channels() : 1
+	//		img.depth() : 6
 
 
 
@@ -1461,31 +1447,31 @@ Mat TransferColor(Mat src){
 }
 
 
-void printMatInfo(Mat img,string name){
+void printMatInfo(Mat img, string name) {
 	cout << endl;
-	cout << name << " : "<<endl;
+	cout << name << " : " << endl;
 	cout << "img.type() : ";
-	cout<<img.type()<<endl;
+	cout << img.type() << endl;
 	cout << "img.size() : ";
 	cout << img.size() << endl;
 	cout << "img.channels() : ";
 	cout << img.channels() << endl;
 	cout << "img.depth() : ";
 	cout << img.depth() << endl;
-	    // depth 用来度量每一个像素中每一个通道的精度，但它本身与图像的通道数无关！depth数值越大，精度越高。在                 Opencv中，Mat.depth()得到的是一个0~6的数字，分别代表不同的位数，对应关系如下：                            
-        // enum{CV_8U=0,CV_8S=1,CV_16U=2,CV_16S=3,CV_32S=4,CV_32F=5,CV_64F=6}          
+	// depth 用来度量每一个像素中每一个通道的精度，但它本身与图像的通道数无关！depth数值越大，精度越高。在                 Opencv中，Mat.depth()得到的是一个0~6的数字，分别代表不同的位数，对应关系如下：                            
+	// enum{CV_8U=0,CV_8S=1,CV_16U=2,CV_16S=3,CV_32S=4,CV_32F=5,CV_64F=6}          
 
-        // 其中U是unsigned的意思，S表示signed，也就是有符号和无符号数。
+	// 其中U是unsigned的意思，S表示signed，也就是有符号和无符号数。
 
-        // 可以理解为房间内每张床可以睡多少人，这个跟房间内有多少床并无关系；
+	// 可以理解为房间内每张床可以睡多少人，这个跟房间内有多少床并无关系；
 
 	cout << endl;
 }
 
 
-void VS_Style(){
+void VS_Style() {
 	Mat src;
-	
+
 	Mat kernel(5, 5, CV_8U);
 	//excellent name6 and sky1 
 	//wrong: name24,12
@@ -1495,19 +1481,19 @@ void VS_Style(){
 	//none:4
 	//excellent ： sky6,5
 	Mat sky = imread("sky1.jpg");
-	
-	imshow("原始图",src);
-	resize(src, src, Size(800,800),1,1);
-	Mat img,img_b,img_r;
-	img_r =TransferColor(src);
+
+	imshow("原始图", src);
+	resize(src, src, Size(800, 800), 1, 1);
+	Mat img, img_b, img_r;
+	img_r = TransferColor(src);
 	// img_r = Gamma(src);
-	
-	
+
+
 	//img_r = src;
 
 	Laplacian(src, img_b, -1, 3, 1, 0, 4);
-	
-	img=img_b+ img_r;
+
+	img = img_b + img_r;
 	imshow("img_b+ img_r", img);
 	imshow("img_b", img_b);
 	//morphologyEx(img, img, MORPH_OPEN, kernel, Point(-1, -1), 1);
@@ -1529,24 +1515,24 @@ void VS_Style(){
 
 
 	equalizeHist(RGB_channels[2], RGB_channels[2]);
-	merge(RGB_channels,3, img);
+	merge(RGB_channels, 3, img);
 	imshow("hsv合成图", img);
 	//blue
 	inRange(img, Scalar(100, 43, 46), Scalar(124, 255, 255), img);
 	//white
 	//inRange(img, Scalar(0, 0, 221), Scalar(360,30,255), img);
-	imshow("掩码天空",img);
+	imshow("掩码天空", img);
 	medianBlur(img, img, 9);
 	imshow("掩码天空，中值滤波", img);
 
-	
+
 	morphologyEx(img, img, MORPH_OPEN, kernel, Point(-1, -1), 10);
-	medianBlur(img, img, 9 );
+	medianBlur(img, img, 9);
 	imshow("多边形", img);
 	// waitKey(0);
 
 	vector<vector<Point> > contours;
-    vector<Vec4i> hierarchy;
+	vector<Vec4i> hierarchy;
 	double maxArea = 0;
 	double maxLength = 0;
 	int maxIndex = 0;
@@ -1555,8 +1541,8 @@ void VS_Style(){
 
 	Rect boundRect;
 	Mat Wang_Rect(img.size(), src.type(), cv::Scalar(0));
-	
-	
+
+
 	waitKey(0);
 
 
@@ -1564,19 +1550,19 @@ void VS_Style(){
 		//长度确定最大矩形周长，面积确定是否闭合。这样才能选择出想要的矩阵图形出来。缺一不可
 		//目前并没有很好检测，可以直接提取矩形，只能近似。
 		//所以仍然存在不完美
-		if (maxLength < arcLength(contours[i], true)&& maxArea<contourArea(contours[i])) {
+		if (maxLength < arcLength(contours[i], true) && maxArea<contourArea(contours[i])) {
 			maxLength = arcLength(contours[i], true);
 			maxArea = contourArea(contours[i]);
 			maxIndex = i;
 		}
 		// drawContours(Wang_mark, contours, i, Scalar::all(i + 1), 1, 8, hierarchy);
-		 //drawContours(Wang_Rect, contours, i, Scalar(255), 1, 8, hierarchy);
+		//drawContours(Wang_Rect, contours, i, Scalar(255), 1, 8, hierarchy);
 		//cout << arcLength(contours[i], true) << endl;
 		//drawContours(Wang_Mat, contours, i, Scalar::all(i + 1), 1, 8, hierarchy);//为什么要这样画？
 	}
 
 	boundRect = boundingRect(Mat(contours[maxIndex]));
-	rectangle(Wang_Rect, boundRect, Scalar(255, 255, 255), -1,8,0);
+	rectangle(Wang_Rect, boundRect, Scalar(255, 255, 255), -1, 8, 0);
 
 	imshow("Wang_Rect", Wang_Rect);
 
@@ -1588,7 +1574,7 @@ void VS_Style(){
 
 	Point 	p((x + width) / 2, (y + height) / 2);
 
-	
+
 
 	Mat src_clone = src;
 	resize(sky, sky, Size(800, 800));
@@ -1604,12 +1590,12 @@ void VS_Style(){
 
 
 	Mat result(sky.size(), sky.type(), cv::Scalar(0));
-	printMatInfo(sky,"sky");
+	printMatInfo(sky, "sky");
 	printMatInfo(src_clone, "src_clone");
 	printMatInfo(img, "img");
-	seamlessClone(sky,src_clone,  img, p, result, NORMAL_CLONE);
+	seamlessClone(sky, src_clone, img, p, result, NORMAL_CLONE);
 	imshow("result", result);
-	
+
 	imwrite("yourname.jpg", result);
 
 	Mat org = imread("原始色图.jpg");
@@ -1627,7 +1613,7 @@ void VS_Style(){
 	}
 	imshow("滤镜效果", result);
 
-	
+
 
 
 
@@ -1638,7 +1624,7 @@ void VS_Style(){
 
 
 
-    result=imread("yourname.jpg");
+	result = imread("yourname.jpg");
 	Mat test = imread("yourname.jpg");
 
 
@@ -1646,7 +1632,7 @@ void VS_Style(){
 	Mat canny_img;
 	bilateralFilter(test, canny_img, 5, 150, 150);
 	bilateralFilter(canny_img, test, 5, 150, 150);
-	
+
 	src;
 	cvtColor(test, src, CV_BGR2GRAY);
 
@@ -1670,7 +1656,7 @@ void VS_Style(){
 	imshow("SobeL1", imgS);
 
 	Mat imgTotal;
-	imgTotal = imgC + imgS + imgL; 
+	imgTotal = imgC + imgS + imgL;
 	normalize(imgTotal, imgTotal, 255, 0, CV_MINMAX);
 	GaussianBlur(imgTotal, imgTotal, Size(3, 3), 3);
 	threshold(imgTotal, imgTotal, 100, 255, THRESH_BINARY_INV);
@@ -1682,13 +1668,226 @@ void VS_Style(){
 	imshow("Result", test);
 
 
-	
+
 	waitKey(0);
 
 
 
+	result = test;
+	test = Gamma(test);
+	imshow("Gamma Result", test);
+
+	cvtColor(result, canny_img, CV_BGR2HLS);
+	imshow("canny_img", canny_img);
+	for (int i = 1; i < canny_img.rows; i++) {
+		for (int j = 1; j < canny_img.cols; j++) {
+			Vec3b c_v = canny_img.at<Vec3b>(i, j);
+			c_v.val[1] *= 2;
+			canny_img.at<Vec3b>(i, j) = c_v;
+
+		}
+	}
+	imshow("CV_BGR2HLS", canny_img);
+	cvtColor(canny_img, canny_img, CV_HLS2BGR);
+	img;
+	bilateralFilter(canny_img, img, 10, 50, 50, 4);
+	imshow("双边滤波 CV_BGR2HLS", img);
+	bilateralFilter(result, canny_img, 10, 50, 50, 4);
+
+	imshow("双边滤波 result", canny_img);
+	canny_img = Gamma(canny_img);
+	imshow("Gamma", canny_img);
+
+
+
+	//  canny_img=IncreaseColor(canny_img,100);
+	//  imshow("IncreaseColor result", canny_img);
+
+	for (int i = 1; i < result.rows; i++) {
+		for (int j = 1; j < result.cols; j++) {
+			Vec3b c_v = result.at<Vec3b>(i, j);
+			int res = 0;
+			int mixPixel = c_v.val[0];
+			int basePixel = (c_v.val[0] + c_v.val[1] + c_v.val[2]) / 3;
+			res = 255 - (255 - mixPixel) * (255 - basePixel) / 255;
+			c_v.val[0] = min(255, max(0, res));
+			mixPixel = c_v.val[1];
+			res = 255 - (255 - mixPixel) * (255 - basePixel) / 255;
+			c_v.val[1] = min(255, max(0, res));
+			mixPixel = c_v.val[2];
+			res = 255 - (255 - mixPixel) * (255 - basePixel) / 255;
+			c_v.val[2] = min(255, max(0, res));
+			//int x = c_v.val[1] / 4 + (c_v.val[0] / 32) * 64;
+			//int y = c_v.val[2] / 4 + (c_v.val[0] % 4) * 64;
+			/*		x = x % 500;
+			y = y % 500;*/
+			result.at<Vec3b>(i, j) = c_v;//filter.at<Vec3b>(x, y);
+
+		}
+	}
+	imshow("滤镜效果", result);
+	waitKey(0);
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+void VS_Result(){
+		Mat src;
+	
+	Mat kernel(5, 5, CV_8U);
+
+	src = imread("name21.jpg");
+
+	Mat sky = imread("sky6.jpg");
+	
+	resize(src, src, Size(800,800),1,1);
+	Mat img,img_b,img_r;
+	img_r =VS_TransferColor(src);
+
+	Laplacian(src, img_b, -1, 3, 1, 0, 4);
+	
+	img=img_b+ img_r;
+	cvtColor(img, img, COLOR_BGR2HSV);
+	Mat RGB_channels[3];
+	split(img, RGB_channels);
+	equalizeHist(RGB_channels[2], RGB_channels[2]);
+	merge(RGB_channels,3, img);
+
+	inRange(img, Scalar(100, 43, 46), Scalar(124, 255, 255), img);
+
+	medianBlur(img, img, 9);
+	
+	morphologyEx(img, img, MORPH_OPEN, kernel, Point(-1, -1), 10);
+	medianBlur(img, img, 9 );
+
+
+	vector<vector<Point> > contours;
+    vector<Vec4i> hierarchy;
+	double maxArea = 0;
+	double maxLength = 0;
+	int maxIndex = 0;
+	findContours(img, contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	Rect boundRect;
+	Mat Wang_Rect(img.size(), src.type(), cv::Scalar(0));
+	
+
+
+	for (int i = 0; i < contours.size(); i++) {
+
+		if (maxLength < arcLength(contours[i], true)&& maxArea<contourArea(contours[i])) {
+			maxLength = arcLength(contours[i], true);
+			maxArea = contourArea(contours[i]);
+			maxIndex = i;
+		}
+	}
+
+	boundRect = boundingRect(Mat(contours[maxIndex]));
+	rectangle(Wang_Rect, boundRect, Scalar(255, 255, 255), -1,8,0);
+
+
+	int x = boundRect.x;
+	int y = boundRect.y;
+	int height = boundRect.height;
+	int width = boundRect.width;
+
+
+	Point 	p((x + width) / 2, (y + height) / 2);
+
+	
+
+	Mat src_clone = src;
+	resize(sky, sky, Size(800, 800));
+	resize(src_clone, src_clone, Size(800, 800));
+
+
+	img = Wang_Rect;
+
+
+	Mat result(sky.size(), sky.type(), cv::Scalar(0));
+
+	seamlessClone(sky,src_clone,  img, p, result, NORMAL_CLONE);
+
+	
+	imwrite("yourname.jpg", result);
+
+	Mat org = imread("原始色图.jpg");
+	Mat filter = imread("新海诚.jpg");
+	resize(filter, filter, Size(800, 800));
+
+
+	for (int i = 1; i < result.rows; i++) {
+		for (int j = 1; j < result.cols; j++) {
+			Vec3b c_v = result.at<Vec3b>(i, j);
+			int x = c_v.val[1] / 4 + (c_v.val[0] / 32) * 64;
+			int y = c_v.val[2] / 4 + (c_v.val[0] % 4) * 64;
+			result.at<Vec3b>(i, j) = filter.at<Vec3b>(x, y);
+		}
+	}
+	imshow("滤镜效果", result);
+
+	
+
+
+
+
+
+
+
+
+
+
+    result=imread("yourname.jpg");
+	Mat test = imread("yourname.jpg");
+
+
+
+	Mat canny_img;
+	bilateralFilter(test, canny_img, 5, 150, 150);
+	bilateralFilter(canny_img, test, 5, 150, 150);
+	
+	src;
+	cvtColor(test, src, CV_BGR2GRAY);
+
+	Mat imgL;
+
+	Laplacian(src, imgL, -1, 3, 1);
+	Mat imgC;
+	Canny(src, imgC, 30, 90);
+
+
+
+	Mat imgS, imgSx, imgSy, imgS0;
+	Sobel(src, imgSx, -1, 0, 1);
+	Sobel(src, imgSx, -1, 1, 0);
+	imgS = imgSx + imgSy;
+	Sobel(src, imgS0, -1, 1, 1);
+
+
+	Mat imgTotal;
+	imgTotal = imgC + imgS + imgL; 
+	normalize(imgTotal, imgTotal, 255, 0, CV_MINMAX);
+	GaussianBlur(imgTotal, imgTotal, Size(3, 3), 3);
+	threshold(imgTotal, imgTotal, 100, 255, THRESH_BINARY_INV);
+
+
+	Mat imgTotalC3;
+	cvtColor(imgTotal, imgTotalC3, CV_GRAY2BGR);
+	bitwise_and(test, imgTotalC3, test);
+
 	 result = test;
 	 test=Gamma(test);
+
+
 	 imshow("Gamma Result", test);
 
 	 cvtColor(result, canny_img, CV_BGR2HLS);
@@ -1701,11 +1900,11 @@ void VS_Style(){
 
 	 	}
 	 }
-	 imshow("CV_BGR2HLS", canny_img);
+
 	 cvtColor(canny_img, canny_img, CV_HLS2BGR);
 	 img;
 	 bilateralFilter(canny_img, img, 10, 50, 50, 4);
-	 imshow("双边滤波 CV_BGR2HLS", img);
+
 	 bilateralFilter(result, canny_img, 10, 50, 50, 4);
 	
 	 imshow("双边滤波 result", canny_img);
@@ -1714,8 +1913,7 @@ void VS_Style(){
 
 
 
-	//  canny_img=IncreaseColor(canny_img,100);
-    //  imshow("IncreaseColor result", canny_img);
+
 
 	 for (int i = 1; i < result.rows; i++) {
 	 	for (int j = 1; j < result.cols; j++) {
@@ -1731,17 +1929,13 @@ void VS_Style(){
 	 		mixPixel = c_v.val[2];
 	 		res = 255 - (255 - mixPixel) * (255 - basePixel) / 255;
 	 		c_v.val[2] = min(255, max(0, res));
-	 		//int x = c_v.val[1] / 4 + (c_v.val[0] / 32) * 64;
-	 		//int y = c_v.val[2] / 4 + (c_v.val[0] % 4) * 64;
-	 /*		x = x % 500;
-	 		y = y % 500;*/
+
 	 		result.at<Vec3b>(i, j) = c_v;//filter.at<Vec3b>(x, y);
 
 	 	}
 	 }
-	 imshow("滤镜效果", result);
+	 imshow("色彩映射", result);
 	 waitKey(0);
-
 
 
 
@@ -1751,7 +1945,8 @@ void VS_Style(){
 
 
 
-Mat IncreaseColor(Mat img,double Value){
+
+Mat IncreaseColor(Mat img, double Value) {
 	imshow("img", img);
 	cvtColor(img, img, COLOR_BGR2HSV);
 	//cvtColor(img, img, COLOR_HSV2BGR);
@@ -1769,11 +1964,11 @@ Mat IncreaseColor(Mat img,double Value){
 		for (int j = 0; j < img.rows; j++) {
 			//Vec3f 这里应该是 Vec3b
 			//归一化后要变成Vec3f
-			Vec3b hls = img.at<Vec3b>(j,i);
+			Vec3b hls = img.at<Vec3b>(j, i);
 
 			/*hls = Vec3f(hls[0],
-				(1 + L / Value)*hls[1] > 1 ? 1 : (1 + L / Value)*hls[1],
-				(1 + S / Value)*hls[2] > 1 ? 1 : (1 + S / Value)*hls[2]);*/
+			(1 + L / Value)*hls[1] > 1 ? 1 : (1 + L / Value)*hls[1],
+			(1 + S / Value)*hls[2] > 1 ? 1 : (1 + S / Value)*hls[2]);*/
 			//hls[0] += 0.3;
 			hls[1] += 50;
 			hls[2] += 20;
@@ -1794,28 +1989,89 @@ Mat IncreaseColor(Mat img,double Value){
 	return img;
 }
 
-Mat Gamma(Mat image){
+Mat Gamma(Mat image) {
+
+	Mat imageGamma(image.size(), CV_32FC3);
+	for (int i = 0; i < image.rows; i++)
+	{
+		for (int j = 0; j < image.cols; j++)
+		{
+			//     imageGamma.at<Vec3f>(i, j)[0] = (image.at<Vec3b>(i, j)[0])*(image.at<Vec3b>(i, j)[0])*(image.at<Vec3b>(i, j)[0]);  
+			//     imageGamma.at<Vec3f>(i, j)[1] = (image.at<Vec3b>(i, j)[1])*(image.at<Vec3b>(i, j)[1])*(image.at<Vec3b>(i, j)[1]);  
+			//     imageGamma.at<Vec3f>(i, j)[2] = (image.at<Vec3b>(i, j)[2])*(image.at<Vec3b>(i, j)[2])*(image.at<Vec3b>(i, j)[2]);  
+			// 
+			imageGamma.at<Vec3f>(i, j)[0] = pow(image.at<Vec3b>(i, j)[0], 0.5);
+			imageGamma.at<Vec3f>(i, j)[1] = pow(image.at<Vec3b>(i, j)[1], 0.5);
+			imageGamma.at<Vec3f>(i, j)[2] = pow(image.at<Vec3b>(i, j)[2], 0.5);
+		}
+	}
+	//归一化到0~255    
+	normalize(imageGamma, imageGamma, 0, 255, CV_MINMAX);
+	//转换成8bit图像显示    
+	convertScaleAbs(imageGamma, imageGamma);
+	imshow("原图", image);
+	imshow("伽马变换图像增强效果", imageGamma);
+	waitKey();
+	return imageGamma;
+}
+
+
+
+
+
+Mat VS_TransferColor(Mat src) {
 	
-    Mat imageGamma(image.size(), CV_32FC3);  
-    for (int i = 0; i < image.rows; i++)  
-    {  
-        for (int j = 0; j < image.cols; j++)  
-        {  
-        //     imageGamma.at<Vec3f>(i, j)[0] = (image.at<Vec3b>(i, j)[0])*(image.at<Vec3b>(i, j)[0])*(image.at<Vec3b>(i, j)[0]);  
-        //     imageGamma.at<Vec3f>(i, j)[1] = (image.at<Vec3b>(i, j)[1])*(image.at<Vec3b>(i, j)[1])*(image.at<Vec3b>(i, j)[1]);  
-        //     imageGamma.at<Vec3f>(i, j)[2] = (image.at<Vec3b>(i, j)[2])*(image.at<Vec3b>(i, j)[2])*(image.at<Vec3b>(i, j)[2]);  
-        // 
-			imageGamma.at<Vec3f>(i, j)[0]=pow(image.at<Vec3b>(i, j)[0],0.5);
-			imageGamma.at<Vec3f>(i, j)[1]=pow(image.at<Vec3b>(i, j)[1],0.5);
-			imageGamma.at<Vec3f>(i, j)[2]=pow(image.at<Vec3b>(i, j)[2],0.5);
-		}  
-    }  
-    //归一化到0~255    
-    normalize(imageGamma, imageGamma, 0, 255, CV_MINMAX);  
-    //转换成8bit图像显示    
-    convertScaleAbs(imageGamma, imageGamma);  
-    imshow("原图", image);  
-    imshow("伽马变换图像增强效果", imageGamma);  
-    waitKey();  
-    return imageGamma;  
+	Mat colorBlue = imread("sky12.jpg");
+	
+	resize(src, src, Size(800, 800));
+	resize(colorBlue, colorBlue, Size(800, 800));
+
+
+	cvtColor(colorBlue, colorBlue, COLOR_BGR2Lab);
+	cvtColor(src, src, COLOR_BGR2Lab);
+
+	//waitKey(0);
+	//Scalar src_tempVal = cv::mean(src);
+	//Scalar colorBlue_tempVal = cv::mean(colorBlue);
+	Mat src_mean, src_Std;
+	Mat colorBlue_mean, colorBlue_Std;
+	meanStdDev(src, src_mean, src_Std, noArray());
+	meanStdDev(colorBlue, colorBlue_mean, colorBlue_Std, noArray());
+
+
+	for (int i = 0; i < src.cols; i++) {
+		for (int j = 0; j < src.rows; j++) {
+
+			for (int channels = 0; channels < 3; channels++) {
+				double pix = src.at<Vec3b>(i, j)[channels];
+				//Vec3b c_v = result.at<Vec3b>(i, j);
+				double cm = colorBlue_mean.at<double>(channels, 0);
+				double cs = colorBlue_Std.at<double>(channels, 0);
+				double sm = src_mean.at<double>(channels, 0);
+				double ss = src_Std.at<double>(channels, 0);
+
+
+				pix = (pix - sm)*(cs / ss) + cm;
+
+
+				if (pix < 0) {
+					pix = 0;
+				}
+				if (pix > 255) {
+					pix = 255;
+				}
+				src.at<Vec3b>(i, j)[channels] = pix;
+
+
+
+			}
+		}
+	}
+	imshow("颜色迁移", src);
+	cvtColor(src, src, COLOR_Lab2BGR);
+	imshow("COLOR_Lab2BGR", src);
+	waitKey(0);
+	return src;
+
+
 }
