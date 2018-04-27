@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stack>
+#include<queue>
 //实验数据7
 //31 4 33 1 10 32 40
 using namespace std;
@@ -36,7 +37,7 @@ BinaryTree * BuildATree()
 				{
 					currentTree->right = newTree;
 					newTree->data = data;
-						newTree->left = NULL;
+					newTree->left = NULL;
 					newTree->right = NULL;
 					break;
 				}
@@ -127,12 +128,12 @@ bool real_postorder(BinaryTree *root)//后序遍历
 		//int i = 0;
 		logg = log.top();
 		//if ((logg->left == NULL&&logg->right == NULL )|| (logg->left == flag&&logg->right == NULL) || (logg->right == flag&&logg->left== NULL))
-		if((logg->left == NULL&&logg->right == NULL) || logg->left == flag || logg->right == flag)
+		if ((logg->left == NULL&&logg->right == NULL) || logg->left == flag || logg->right == flag)
 		{
-			cout <<i<< ":";
+			cout << i << ":";
 			i++;
 			cout << logg->data << endl;
-			
+
 			flag = logg;
 			log.pop();
 		}
@@ -157,16 +158,17 @@ int NodeNumber(BinaryTree *root)//计算结点数量
 	int number;
 	queue<BinaryTree*>Tree;
 	Tree.push(root);
-	root1=root;
-	number=1;
-	while(!Tree.empty())
+	root1 = root;
+	number = 1;
+	while (!Tree.empty())
 	{
-		if(root1->left!=NULL)
+		root1 = Tree.front();
+		if (root1->left != NULL)
 		{
 			Tree.push(root1->left);
 			number++;
 		}
-		if(root1->right!=NULL)
+		if (root1->right != NULL)
 		{
 			Tree.push(root1->right);
 			number++;
@@ -175,13 +177,51 @@ int NodeNumber(BinaryTree *root)//计算结点数量
 	}
 	return number;
 }
+typedef struct integer
+{
+	int number;
+	integer *next;
+}Integer;
+int Depth_Tree(BinaryTree * root)//宽度
+{
+	Integer *Depth=(Integer *)malloc(sizeof(Integer));
+	BinaryTree *root1;
+	int number;
+	queue<BinaryTree*>Tree;
+	Tree.push(root);
+	root1 = root;
+	number = 1;
+	Depth->number=number;
+	int front;
+	int rear;
+	Integer *new;
+	new=Depth;
+	while (!Tree.empty())
+	{
+		root1 = Tree.front();
+		if (root1->left != NULL)
+		{
+			Tree.push(root1->left);
+			number++;
+		}
+		if (root1->right != NULL)
+		{
+			Tree.push(root1->right);
+			number++;
+		}
+		Tree.pop();
+	}
+	return number;
+
+}
+int Width_Tree(BinaryTree * root)
 int main(int argc, char const *argv[])
 {
 	BinaryTree *FirstTree;
 	FirstTree = BuildATree();
 	//Preorder(FirstTree);
 	//postorder(FirstTree);
-	cout<<NodeNumber(FirstTree)<<endl;
+	cout << NodeNumber(FirstTree) << endl;
 	system("pause");
 	return 0;
 }
