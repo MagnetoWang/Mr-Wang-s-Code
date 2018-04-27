@@ -10,7 +10,13 @@ using namespace std;
 using namespace cv;
 
 //----------------------------------------
+void printMatInfo(Mat img,string name);
 void printMat(Mat img);
+Mat IncreaseColor(Mat img,double Value);
+Mat Gamma(Mat image);
+
+
+
 void correcting(Mat src);
 void printMatValue(Mat img);
 void Wait_Wang();
@@ -26,7 +32,10 @@ void yourname();
 void callBack(int, void*) ;
 void hsv_function();
 void colorMap();
+Mat TransferColor(Mat src);
+
 void VS_Style();
+
 
 
 
@@ -66,14 +75,19 @@ Mat dst;
 //----------------------------------------
 
 int main() {
+	Mat img;
+	 img = imread("name26.jpg");
+	 resize(img,img,Size(800,800));
 	 //yourname();
 	//colorMap();
-	//VS_Style();
+	VS_Style();
 	//hsv_function();
+	// TransferColor();
+	// IncreaseColor(img,100.0);
+	// Gamma(img);
 	int  i = 0;
 	cin >> i;
 
-	Mat img;
 	 img = imread("adjust14.jpg");
 	//img = imread("rotation2.jpg");
 	//Hough(img);
@@ -87,7 +101,7 @@ int main() {
 }
 //打印Mat的详细信息，长和宽
 void printMat(Mat img) {
-	cout << img.rows << "  " << img.cols << endl;
+	cout << img << endl;
 }
 void Rotation(Mat img) {
 	Mat srcImg = img;
@@ -1309,20 +1323,199 @@ void callBack(int, void*)
     imwrite("HSV_inRange.jpg", dst);  
 }  
 
+Mat TransferColor(Mat src){
+	cout << "TransferColor enter" << endl;
+	Mat colorBlue=imread("sky12.jpg");
+	// Mat src=imread("name29.jpg");
+	resize(src, src, Size(800, 800));
+	resize(colorBlue, colorBlue, Size(800, 800));
+	imshow("src", src);
+	imshow("colorBlue", colorBlue);
+	//waitKey(0);
+	cvtColor(colorBlue, colorBlue, COLOR_BGR2Lab);
+	cvtColor(src, src, COLOR_BGR2Lab);
+	imshow("src_Lab", src);
+	imshow("colorBlue_Lab", colorBlue);
+	 //waitKey(0);
+	//Scalar src_tempVal = cv::mean(src);
+	//Scalar colorBlue_tempVal = cv::mean(colorBlue);
+	Mat src_mean, src_Std;
+	Mat colorBlue_mean, colorBlue_Std;
+	meanStdDev(src, src_mean, src_Std,noArray());
+	meanStdDev(colorBlue, colorBlue_mean, colorBlue_Std, noArray());
+	printMatInfo(colorBlue,"colorBlue");
+	printMatInfo(src,"src");
+	printMatInfo(src_mean, "src_mean");
+	printMatInfo(src_Std, "src_Std");
+	printMatInfo(colorBlue_mean, "colorBlue_mean");
+	printMatInfo(colorBlue_Std, "colorBlue_Std");
+	printMat(src_mean);
+	printMat(colorBlue_mean);
+	//waitKey(0);
+	
+	//颜色映射
+	//Size(cols, rows) opencv的api我真是无语了。幸好之前的都800*800的大小
+	//列，行 不是 行，列
+	for (int i = 0; i < src.cols; i++) {
+		for (int j = 0; j < src.rows; j++) {
+			 
+			for (int channels = 0; channels < 3; channels++) {
+				double pix = src.at<Vec3b>(i, j)[channels];
+				//Vec3b c_v = result.at<Vec3b>(i, j);
+				double cm = colorBlue_mean.at<double>( channels,0);
+				double cs = colorBlue_Std.at<double>(channels, 0);
+				double sm = src_mean.at<double>(channels, 0);
+				double ss = src_Std.at<double>(channels, 0);
+	/*			首先，将源图像原有的数据减掉源图像的均值
+
+					L = l – ml
+
+					A = a – ma
+
+					B = b – mb
+
+					再将得到的新数据按比例放缩，其放缩系数是两幅图像标准方差的比值
+
+					L’ = (nl’ / nl)* L
+
+					A’ = (na’ / na)* A
+
+					B’ = (nb’ / nb)* B
+
+					将得到的l’、a’、b’分别加上目标图像三个通道的均值，得到最终数据
+
+					L = L’ + ml’
+
+					A = A’ + ma’
+
+					B = B’ + mb’
+
+					整理后得到目标图像与源图像之间的像素关系表达
+
+					L = (nl’ / nl)* (l – ml) + ml’
+
+					A = (na’ / na)* (a – ma) + ma’
+
+					B = (nb’ / nb)* (b – mb) + mb’*/
+
+				pix = (pix - sm)*(cs / ss) + cm;
+
+				//pix = (pix - colorBlue_mean.at<double>(0, channels))*
+				//	(src_Std.at<double>(0, channels) / colorBlue_Std.at<double>(0, channels))
+				//	+ src_mean.at<double>(0, channels);
+				if (pix < 0) {
+					pix = 0;
+				}
+				if (pix > 255) {
+					pix = 255;
+				}
+				src.at<Vec3b>(i, j)[channels] = pix;
+
+
+
+			}
+		}
+	}
+	imshow("颜色迁移", src);
+	cvtColor(src, src, COLOR_Lab2BGR);
+	imshow("COLOR_Lab2BGR", src);
+	waitKey(0);
+	return src;
+
+
+
+//src_mean:
+//	img.type() : 6
+//		img.size() : [1 x 3]
+//		img.channels() : 1
+//		img.depth() : 6
+//
+//
+//		src_Std :
+//		img.type() : 6
+//		img.size() : [1 x 3]
+//		img.channels() : 1
+//		img.depth() : 6
+//
+//
+//		colorBlue_mean :
+//		img.type() : 6
+//		img.size() : [1 x 3]
+//		img.channels() : 1
+//		img.depth() : 6
+//
+//
+//		colorBlue_Std :
+//		img.type() : 6
+//		img.size() : [1 x 3]
+//		img.channels() : 1
+//		img.depth() : 6
 
 
 
 
+
+
+
+
+}
+
+
+void printMatInfo(Mat img,string name){
+	cout << endl;
+	cout << name << " : "<<endl;
+	cout << "img.type() : ";
+	cout<<img.type()<<endl;
+	cout << "img.size() : ";
+	cout << img.size() << endl;
+	cout << "img.channels() : ";
+	cout << img.channels() << endl;
+	cout << "img.depth() : ";
+	cout << img.depth() << endl;
+	    // depth 用来度量每一个像素中每一个通道的精度，但它本身与图像的通道数无关！depth数值越大，精度越高。在                 Opencv中，Mat.depth()得到的是一个0~6的数字，分别代表不同的位数，对应关系如下：                            
+        // enum{CV_8U=0,CV_8S=1,CV_16U=2,CV_16S=3,CV_32S=4,CV_32F=5,CV_64F=6}          
+
+        // 其中U是unsigned的意思，S表示signed，也就是有符号和无符号数。
+
+        // 可以理解为房间内每张床可以睡多少人，这个跟房间内有多少床并无关系；
+
+	cout << endl;
+}
 
 
 void VS_Style(){
 	Mat src;
-	src = imread("name12.jpg");
+	
+	Mat kernel(5, 5, CV_8U);
+	//excellent name6 and sky1 
+	//wrong: name24,12
+	//bad: 9,7
+	//excellent : name 21,20,18,8,5
+	src = imread("yourname1.jpg");
+	//none:4
+	//excellent ： sky6,5
+	Mat sky = imread("sky1.jpg");
+	
 	imshow("原始图",src);
-	Mat img;
-	resize(src, img, Size(800,800),1,1);
+	resize(src, src, Size(800,800),1,1);
+	Mat img,img_b,img_r;
+	img_r =TransferColor(src);
+	// img_r = Gamma(src);
+	
+	
+	//img_r = src;
+
+	Laplacian(src, img_b, -1, 3, 1, 0, 4);
+	
+	img=img_b+ img_r;
+	imshow("img_b+ img_r", img);
+	imshow("img_b", img_b);
+	//morphologyEx(img, img, MORPH_OPEN, kernel, Point(-1, -1), 1);
+	//gamma变亮以后细节就会消失影响，后面的边缘操作 	
+	//  img=Gamma(src);
 
 	imshow("800X800图", img);
+	waitKey(0);
 	cvtColor(img, img, COLOR_BGR2HSV);
 
 	imshow("COLOR_BGR2HSV图", img);
@@ -1337,25 +1530,26 @@ void VS_Style(){
 
 	equalizeHist(RGB_channels[2], RGB_channels[2]);
 	merge(RGB_channels,3, img);
-	imshow("分离图", img);
+	imshow("hsv合成图", img);
 	//blue
-	//inRange(img, Scalar(100, 43, 46), Scalar(124, 255, 255), img);
+	inRange(img, Scalar(100, 43, 46), Scalar(124, 255, 255), img);
 	//white
-	inRange(img, Scalar(0, 0, 221), Scalar(360,30,255), img);
+	//inRange(img, Scalar(0, 0, 221), Scalar(360,30,255), img);
 	imshow("掩码天空",img);
 	medianBlur(img, img, 9);
 	imshow("掩码天空，中值滤波", img);
 
-	Mat kernel(5, 5,CV_8U);
+	
 	morphologyEx(img, img, MORPH_OPEN, kernel, Point(-1, -1), 10);
 	medianBlur(img, img, 9 );
 	imshow("多边形", img);
+	// waitKey(0);
 
 	vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
-
-	
-
+	double maxArea = 0;
+	double maxLength = 0;
+	int maxIndex = 0;
 	findContours(img, contours, hierarchy, RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	imshow("img", img);
 
@@ -1363,9 +1557,26 @@ void VS_Style(){
 	Mat Wang_Rect(img.size(), src.type(), cv::Scalar(0));
 	
 	
+	waitKey(0);
 
-	boundRect = boundingRect(Mat(contours[0]));
-	rectangle(Wang_Rect, boundRect, Scalar(255, 255, 255), 1,8,0);
+
+	for (int i = 0; i < contours.size(); i++) {
+		//长度确定最大矩形周长，面积确定是否闭合。这样才能选择出想要的矩阵图形出来。缺一不可
+		//目前并没有很好检测，可以直接提取矩形，只能近似。
+		//所以仍然存在不完美
+		if (maxLength < arcLength(contours[i], true)&& maxArea<contourArea(contours[i])) {
+			maxLength = arcLength(contours[i], true);
+			maxArea = contourArea(contours[i]);
+			maxIndex = i;
+		}
+		// drawContours(Wang_mark, contours, i, Scalar::all(i + 1), 1, 8, hierarchy);
+		 //drawContours(Wang_Rect, contours, i, Scalar(255), 1, 8, hierarchy);
+		//cout << arcLength(contours[i], true) << endl;
+		//drawContours(Wang_Mat, contours, i, Scalar::all(i + 1), 1, 8, hierarchy);//为什么要这样画？
+	}
+
+	boundRect = boundingRect(Mat(contours[maxIndex]));
+	rectangle(Wang_Rect, boundRect, Scalar(255, 255, 255), -1,8,0);
 
 	imshow("Wang_Rect", Wang_Rect);
 
@@ -1377,7 +1588,7 @@ void VS_Style(){
 
 	Point 	p((x + width) / 2, (y + height) / 2);
 
-	Mat sky = imread("sky5.jpg");
+	
 
 	Mat src_clone = src;
 	resize(sky, sky, Size(800, 800));
@@ -1388,9 +1599,14 @@ void VS_Style(){
 	imshow("sky", sky);
 	imshow("src_clone_sky_img", img);
 	waitKey(0);
+	//cvtColor
+	img = Wang_Rect;
+
 
 	Mat result(sky.size(), sky.type(), cv::Scalar(0));
-
+	printMatInfo(sky,"sky");
+	printMatInfo(src_clone, "src_clone");
+	printMatInfo(img, "img");
 	seamlessClone(sky,src_clone,  img, p, result, NORMAL_CLONE);
 	imshow("result", result);
 	
@@ -1465,12 +1681,15 @@ void VS_Style(){
 	bitwise_and(test, imgTotalC3, test);
 	imshow("Result", test);
 
+
 	
 	waitKey(0);
 
 
 
 	 result = test;
+	 test=Gamma(test);
+	 imshow("Gamma Result", test);
 
 	 cvtColor(result, canny_img, CV_BGR2HLS);
 	 imshow("canny_img", canny_img);
@@ -1490,8 +1709,13 @@ void VS_Style(){
 	 bilateralFilter(result, canny_img, 10, 50, 50, 4);
 	
 	 imshow("双边滤波 result", canny_img);
+	 canny_img=Gamma(canny_img);
+	 imshow("Gamma", canny_img);
 
 
+
+	//  canny_img=IncreaseColor(canny_img,100);
+    //  imshow("IncreaseColor result", canny_img);
 
 	 for (int i = 1; i < result.rows; i++) {
 	 	for (int j = 1; j < result.cols; j++) {
@@ -1521,14 +1745,77 @@ void VS_Style(){
 
 
 
+}
 
 
 
 
 
+Mat IncreaseColor(Mat img,double Value){
+	imshow("img", img);
+	cvtColor(img, img, COLOR_BGR2HSV);
+	//cvtColor(img, img, COLOR_HSV2BGR);
+	imshow("img COLOR_BGR2HSV", img);
+	double H = 360;
+	double S = 2;
+	double L = 2;
+	//归一化操作
+	//img.convertTo(img,CV_32FC3,1.0/255,0);
 
+	printMatInfo(img, "img");
+	//0<H<360,0<L<1,0<S<1
+	imshow("before color enhance", img);
+	for (int i = 0; i < img.cols; i++) {
+		for (int j = 0; j < img.rows; j++) {
+			//Vec3f 这里应该是 Vec3b
+			//归一化后要变成Vec3f
+			Vec3b hls = img.at<Vec3b>(j,i);
 
+			/*hls = Vec3f(hls[0],
+				(1 + L / Value)*hls[1] > 1 ? 1 : (1 + L / Value)*hls[1],
+				(1 + S / Value)*hls[2] > 1 ? 1 : (1 + S / Value)*hls[2]);*/
+			//hls[0] += 0.3;
+			hls[1] += 50;
+			hls[2] += 20;
+			if (hls[1] > 255) {
+				hls[1] -= 50;
+			}
+			if (hls[2] > 255) {
+				hls[2] -= 50;
+			}
 
+			img.at<Vec3b>(j, i) = hls;
 
+		}
+	}
+	cvtColor(img, img, COLOR_HSV2BGR);
+	imshow("color enhance", img);
+	waitKey(0);
+	return img;
+}
 
+Mat Gamma(Mat image){
+	
+    Mat imageGamma(image.size(), CV_32FC3);  
+    for (int i = 0; i < image.rows; i++)  
+    {  
+        for (int j = 0; j < image.cols; j++)  
+        {  
+        //     imageGamma.at<Vec3f>(i, j)[0] = (image.at<Vec3b>(i, j)[0])*(image.at<Vec3b>(i, j)[0])*(image.at<Vec3b>(i, j)[0]);  
+        //     imageGamma.at<Vec3f>(i, j)[1] = (image.at<Vec3b>(i, j)[1])*(image.at<Vec3b>(i, j)[1])*(image.at<Vec3b>(i, j)[1]);  
+        //     imageGamma.at<Vec3f>(i, j)[2] = (image.at<Vec3b>(i, j)[2])*(image.at<Vec3b>(i, j)[2])*(image.at<Vec3b>(i, j)[2]);  
+        // 
+			imageGamma.at<Vec3f>(i, j)[0]=pow(image.at<Vec3b>(i, j)[0],0.5);
+			imageGamma.at<Vec3f>(i, j)[1]=pow(image.at<Vec3b>(i, j)[1],0.5);
+			imageGamma.at<Vec3f>(i, j)[2]=pow(image.at<Vec3b>(i, j)[2],0.5);
+		}  
+    }  
+    //归一化到0~255    
+    normalize(imageGamma, imageGamma, 0, 255, CV_MINMAX);  
+    //转换成8bit图像显示    
+    convertScaleAbs(imageGamma, imageGamma);  
+    imshow("原图", image);  
+    imshow("伽马变换图像增强效果", imageGamma);  
+    waitKey();  
+    return imageGamma;  
 }
