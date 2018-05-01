@@ -1,7 +1,7 @@
-﻿  ColorTransfer.cpp
-c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\colortransfer.cpp(282): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\colortransfer.cpp(283): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\colortransfer.cpp(284): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\colortransfer.cpp(342): warning C4244: “=”: 从“double”转换到“uchar”，可能丢失数据
+﻿  homography.cpp
+c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\homography.cpp(21): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\homography.cpp(39): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\homography.cpp(40): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+c:\users\magneto_wang\documents\github\mr-wang-s-code\opencv_android\opencv_android\homography.cpp(41): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
   OpenCV_Android.vcxproj -> C:\Users\Magneto_Wang\Documents\GitHub\Mr-Wang-s-Code\OpenCV_Android\x64\Debug\OpenCV_Android.exe
   OpenCV_Android.vcxproj -> C:\Users\Magneto_Wang\Documents\GitHub\Mr-Wang-s-Code\OpenCV_Android\x64\Debug\OpenCV_Android.pdb (Partial PDB)

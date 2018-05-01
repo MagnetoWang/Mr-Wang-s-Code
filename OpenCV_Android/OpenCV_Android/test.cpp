@@ -74,7 +74,7 @@ Mat dst;
 
 //----------------------------------------
 
-int main() {
+int test_main() {
 	Mat img;
 	img = imread("name26.jpg");
 	resize(img, img, Size(800, 800));

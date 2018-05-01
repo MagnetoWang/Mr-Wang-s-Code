@@ -18,6 +18,7 @@ int VS_main() {
 	VS_Results();
 	int  i = 0;
 	cin >> i;
+	return 0;
 }
 void VS_Results() {
 	Mat src;
